@@ -1,25 +1,105 @@
+<template name="mainLayout">
+
 <head>
-  <title>simple</title>
+  <title>Crosser V3</title>
 </head>
 
 <body>
-  <h1>Welcome to Meteor!</h1>
 
-  {{> hello}}
-  {{> info}}
+  {{>Template.dynamic template=content}}
+
+
+  <div id="footer">
+    © James Southern 2016
+  </div>
 </body>
-
-<template name="hello">
-  <button>Click Me</button>
-  <p>You've pressed the button {{counter}} times.</p>
 </template>
 
-<template name="info">
-  <h2>Learn Meteor!</h2>
-  <ul>
-    <li><a href="https://www.meteor.com/try">Do the Tutorial</a></li>
-    <li><a href="http://guide.meteor.com">Follow the Guide</a></li>
-    <li><a href="https://docs.meteor.com">Read the Docs</a></li>
-    <li><a href="https://forums.meteor.com">Discussions</a></li>
-  </ul>
+<template name="landing">
+  <h1>Welcome to Crosser!</h1>
+</template>
+
+<template name="plant">
+  {{plant.name}}
+
+  {{#each l in plant.loci}}
+    {{> loci loci=l}}
+  {{/each}}
+
+  <br/>
+  <br/>
+</template>
+
+<template name="loci">
+  <br/>
+  {{loci.name}} ||
+  {{loci.type}} ||
+  {{loci.linkage_group}} ||
+  {{loci.position}}
+</template>
+
+<template name="cross">
+  {{cross.name}}<br/>
+</template>
+
+<template name="chart">
+  {{chart.type}}<br/>
+</template>
+
+<template name="scheme">
+
+  <h1>Edit Scheme: {{scheme.name}}</h1>
+
+  <div id="teal-title">
+    <h1 id="teal-title">Config:</h1>
+  </div>
+
+  <div id="teal-list">
+    species: {{scheme.species.name}}
+    <br/>
+    Simulation Resolution:
+
+      {{scheme.system.convergence_tolerance}}
+      {{scheme.system.convergence_fewest_plants}}
+      {{scheme.system.convergence_chunk_size}}
+    <br/>
+  </div>
+
+  <div id="teal-title">
+    <h1 id="teal-title">Plants: </h1>
+  </div>
+  <div id="teal-list">
+
+    {{#each p in scheme.plants}}
+      {{> plant plant=p}}
+    {{/each}}
+  </div>
+
+  <div id="teal-title">
+    <h1 id="teal-title">Crosses: </h1>
+  </div>
+  <div id="teal-list">
+    {{#each c in scheme.crosses}}
+      {{> cross cross=c}}
+    {{/each}}
+  </div>
+
+  <div id="teal-title">
+    <h1 id="teal-title">Charts: </h1>
+  </div>
+  <div id="teal-list">
+    {{#each o in scheme.outputs}}
+      {{> chart chart=o}}
+    {{/each}}
+  </div>
+
+
+
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+
+    Save :: Revert :: Process
+
 </template>

@@ -1,0 +1,199 @@
+{
+  "crosses": [
+    {
+      "left": "P1 2",
+      "loci": [
+        "T1.1",
+        "T2.2"
+      ],
+      "name": "F12",
+      "right": "P2",
+      "zygosity": "Heterozygous"
+    },
+    {
+      "left": "F12",
+      "loci": [
+        "T1.1",
+        "T2.2",
+        "T3.1",
+        "T3.2",
+        "T4.2"
+      ],
+      "name": "F1234",
+      "right": "F34",
+      "zygosity": "Heterozygous"
+    },
+    {
+      "left": "F1234",
+      "loci": [
+        "T1.1",
+        "T2.2",
+        "T3.1",
+        "T3.2",
+        "T4.2"
+      ],
+      "name": "BC1",
+      "right": "Pref_Var",
+      "zygosity": "Heterozygous"
+    },
+    {
+      "left": "BC1",
+      "loci": [
+        "T1.1",
+        "T2.2",
+        "T3.1",
+        "T3.2",
+        "T4.2"
+      ],
+      "name": "BC2",
+      "right": "Pref_Var",
+      "zygosity": "Heterozygous"
+    },
+    {
+      "left": "BC2",
+      "loci": [
+        "T1.1",
+        "T2.2",
+        "T3.1",
+        "T3.2",
+        "T4.2"
+      ],
+      "name": "BC3",
+      "right": "Pref_Var",
+      "zygosity": "Heterozygous"
+    },
+    {
+      "left": "P3",
+      "loci": [
+        "T3.1",
+        "T3.2",
+        "T4.2"
+      ],
+      "name": "F34",
+      "right": "P4",
+      "zygosity": "Heterozygous"
+    },
+    {
+      "left": "BC3",
+      "loci": [
+        "T1.1",
+        "T2.2",
+        "T3.1",
+        "T3.2",
+        "T4.2"
+      ],
+      "name": "Self",
+      "right": "BC3",
+      "zygosity": "Homozygous"
+    }
+  ],
+  "name": "eg1",
+  "outputs": [
+    {
+      "data": "{\"require\": [{\"cross\":\"F12\",\"quantity\":5,\"confidence\":0.95},{\"cross\":\"BC2\",\"quantity\":5,\"confidence\":0.95},{\"cross\":\"Self\",\"quantity\":5,\"confidence\":0.95}]}",
+      "type": "success_table"
+    },
+    {
+      "data": "{\"cross\": \"Self\" }",
+      "type": "loci_composition"
+    },
+    {
+      "data": "{\"cross\": \"BC3\" }",
+      "type": "loci_composition"
+    },
+    {
+      "data": "{\"cross\": \"F1234\" }",
+      "type": "loci_composition"
+    },
+    {
+      "data": "{\"donor\": \"Pref_Var\", \"cross\": \"BC3\" }",
+      "type": "proportion_distribution"
+    },
+    {
+      "data": "{\"donor\": \"Pref_Var\", \"cross\": \"BC2\" }",
+      "type": "proportion_distribution"
+    },
+    {
+      "data": "{\"crosses\": [\"F12\",\"F34\",\"F1234\",\"BC1\",\"BC2\",\"BC3\",\"Self\"]}",
+      "type": "mean_cross_composition"
+    }
+  ],
+  "plants": [
+    {
+      "loci": [
+        {
+          "linkage_group": 5,
+          "name": "T1.1",
+          "position": 9,
+          "type": "Trait"
+        }
+      ],
+      "name": "P1 2"
+    },
+    {
+      "loci": [
+        {
+          "linkage_group": 6,
+          "name": "T2.2",
+          "position": 14,
+          "type": "Trait"
+        }
+      ],
+      "name": "P2"
+    },
+    {
+      "loci": [],
+      "name": "Pref_Var"
+    },
+    {
+      "loci": [
+        {
+          "linkage_group": 11,
+          "name": "T3.2",
+          "type": "Trait"
+        },
+        {
+          "linkage_group": 4,
+          "name": "T3.1",
+          "position": 140,
+          "type": "Trait"
+        }
+      ],
+      "name": "P3"
+    },
+    {
+      "loci": [
+        {
+          "linkage_group": 1,
+          "name": "T4.2",
+          "position": 1,
+          "type": "Trait"
+        }
+      ],
+      "name": "P4"
+    }
+  ],
+  "pref_var": "P1 2",
+  "species": {
+    "chromosome_lengths": [
+      203,
+      276,
+      236,
+      200,
+      133,
+      163,
+      188,
+      206,
+      143,
+      132,
+      164
+    ],
+    "name": "Phaseolus Vulgaris"
+  },
+  "system": {
+    "convergence_chunk_size": 1000,
+    "convergence_fewest_plants": 10,
+    "convergence_tolerance": 0.5,
+    "frozen": true
+  }
+}

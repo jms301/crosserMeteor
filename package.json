@@ -1,10 +1,28 @@
 {
-  "name": "crosserMeteor",
+  "name": "crossermeteor",
   "private": true,
   "scripts": {
     "start": "meteor run"
   },
   "dependencies": {
+    "async": "^2.0.0-rc.6",
+    "bootstrap": "^3.3.6",
+    "d3-queue": "^3.0.0",
+    "file-system": "^2.2.1",
     "meteor-node-stubs": "~0.2.0"
-  }
+  },
+  "description": "A Meteor frontend to the Crosser plant breeding simulator.",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jms301/crosserMeteor.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jms301/crosserMeteor/issues"
+  },
+  "homepage": "https://github.com/jms301/crosserMeteor#readme"
 }
