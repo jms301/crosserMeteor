@@ -1,13 +1,45 @@
-<template name="mainLayout">
-
 <head>
-  <title>Crosser V3</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Crosser</title>
+
 </head>
 
+<template name="mainLayout">
+
 <body>
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+  	<div class="container">
+ 	 		<div class="navbar-header">
+ 	 			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+  				<span class="sr-only">Toggle navigation</span>
+  				<span class="icon-bar"></span>
+  				<span class="icon-bar"></span>
+  				<span class="icon-bar"></span>
+  			</button>
+  			<a class="navbar-brand" href="#">Crosser</a>
+  		</div>
+  		<div id="navbar" class="collapse navbar-collapse">
+  			<ul class="nav navbar-nav">
+  				<li class="active"><a href="#">Home</a></li>
+  				<li><a href="#about">Schemes</a></li>
+  				<li><a href="#about">Calculations</a></li>
+  				<li><a href="#about">Admin</a></li>
+  				<li><a href="#contact">Contact</a></li>
+  			</ul>
 
-  {{>Template.dynamic template=content}}
+        <ul class="nav navbar-nav navbar-right">
+          {{> loginButtons}} <!-- here -->
+        </ul>
+  		</div><!--/.nav-collapse -->
+  	</div>
+  </nav>
 
+  <div class="container">
+  		{{>Template.dynamic template=content}}
+  </div>
 
   <div id="footer">
     © James Southern 2016
@@ -19,87 +51,192 @@
   <h1>Welcome to Crosser!</h1>
 </template>
 
+<template name="simulationResolution">
+
+    <h3>Simulation Resolution:</h3>
+      <select id="resolution">
+        <option value="draft">Draft (Very Low)</option>
+        <option value="low">Low</option>
+        <option value="high">High</option>
+        <option value="custom">Custom</option>
+
+		</select>
+
+
+
+
+      <div>Chunk Size: <input id="chunk-size" value="{{convergence_chunk_size}}"/></div>
+      <div>Tolerance:  <input id="tolerance" value="{{convergence_tolerance}}"/></div>
+      <div>Min Plants: <input id="min-plants" value="{{convergence_fewest_plants}}"/></div>
+
+</template>
+
 <template name="plant">
-  {{plant.name}}
+  <div class="teal-item">
+  <h3 class="item-title inline-h"> Parent name:</h3> <input class="parent-name" value="{{plant.name}}"/><button class="delete-parent">X</button>
 
-  {{#each l in plant.loci}}
-    {{> loci loci=l}}
-  {{/each}}
+  <div class="orange-title">
+    <h4 class="orange-title">
+      Loci:
+    </h4>
+  </div>
+  <div class="orange-list">
+  <table>
+    {{#if plant.loci}}
+    <tr>
+      <th>Name:</th>
+      <th>Type</th>
+      <th>Linkage Group /<br/>
+       Chromosome</th>
+      <th>Position</th>
+      <th></th>
+    </tr>
+    {{/if}}
+    {{#each l in plant.loci}}
+      {{> loci loci=l li=@index pi=pi}}
+    {{/each}}
 
-  <br/>
-  <br/>
+    </table>
+    <div class="orange-item">
+      <button class="add-locus">+ Add Locus</button>
+    </div>
+  </div>
+  </div>
 </template>
 
 <template name="loci">
-  <br/>
-  {{loci.name}} ||
-  {{loci.type}} ||
-  {{loci.linkage_group}} ||
-  {{loci.position}}
+  <tr>
+    <td><input class="loci-name" value="{{loci.name}}"/></td>
+    <td><select>
+      <option>Target Gene</option>
+      <option>Marker</option>
+    <!--{{loci.type}}-->
+    </select></td>
+
+    <td><input style="width:5em;" type="number" value = {{loci.linkage_group}} /></td>
+    <td><input style="width:5em;" type="number" value = {{loci.position}} /></td>
+    <td><button class="delete-loci">X</button> </td>
+
+  </tr>
 </template>
 
 <template name="cross">
-  {{cross.name}}<br/>
+  <tr>
+    <td><input value="{{cross.name}}"></td>
+    <td><select class="rparent" >{{optionsForSelect cross}}</select>
+    </td>
+    <td><select class="lparent" >{{optionsForSelect cross}}</select>
+    </td>
+    <td><select class="zygosity">
+      <option {{isSelected cross.zygosity "Homozygous"}} value="Homozygous">Homozygous</option>
+      <option {{isSelected cross.zygosity "Heterozygous"}} value="Heterozygous">Heterozygous</option>
+    </select>
+    </td>
+    <td>
+    {{#each l in cross.loci}}
+      {{>CrossLoci loci=l}}
+    {{/each}}
+    </td>
+  </tr>
+</template>
+
+<template name="CrossLoci">
+  <span> {{loci}} <span>X</span></span>
 </template>
 
 <template name="chart">
-  {{chart.type}}<br/>
+  <div class="teal-item">
+    <select class="type">
+      <option {{isSelected chart.type "success_table"}}>Success Table</option>
+      <option {{isSelected chart.type "loci_composition"}}>Loci Composition</option>
+      <option {{isSelected chart.type "proportion_distribution"}}>Proportion Distribution</option>
+      <option {{isSelected chart.type "mean_cross_composition"}}>Mean Cross Composition</option>
+      <option {{isSelected chart.type "custom"}}>Custom</option>
+    </select>
+
+    <input value="{{chart.data}}" />
+  </div>
 </template>
 
-<template name="scheme">
 
+<template name="scheme">
+<div class="row">
+<div class="col-md-12">
   <h1>Edit Scheme: {{scheme.name}}</h1>
 
-  <div id="teal-title">
-    <h1 id="teal-title">Config:</h1>
+  <div class="teal-title">
+    <h1 class="teal-title">Config</h1>
   </div>
 
-  <div id="teal-list">
-    species: {{scheme.species.name}}
-    <br/>
-    Simulation Resolution:
+  <div class="teal-list teal-no-item">
+    <h3 >Species:</h3>
+		<select id="species">
+			{{#each species in speciesList}}
+			<option value='{{species.value}}'
+				{{selectedSpecies species scheme.species.name}}
+			>{{species.name}}</option>
 
-      {{scheme.system.convergence_tolerance}}
-      {{scheme.system.convergence_fewest_plants}}
-      {{scheme.system.convergence_chunk_size}}
-    <br/>
+			{{/each}}
+		</select>
+
+      {{> simulationResolution scheme.system }}
+
   </div>
 
-  <div id="teal-title">
-    <h1 id="teal-title">Plants: </h1>
+  <div class="teal-title">
+    <h1 class="teal-title">Parents</h1>
   </div>
-  <div id="teal-list">
+  <div class="teal-list">
 
     {{#each p in scheme.plants}}
-      {{> plant plant=p}}
+      {{> plant plant=p pi=@index}}
     {{/each}}
+    <div class="teal-item">
+      <button id="add-parent">+ add parent</button>
+    </div>
   </div>
 
-  <div id="teal-title">
-    <h1 id="teal-title">Crosses: </h1>
+  <div class="teal-title">
+    <h1 class="teal-title">Crosses</h1>
   </div>
-  <div id="teal-list">
+
+  <div class="teal-list">
+  <table>
+    {{#if scheme.crosses}}
+    <tr>
+    <th>Name:</th>
+    <th>Parent:</th>
+    <th>Parent:</th>
+    <th>Selection Zygosity</th>
+    <th>Loci To Select For:</th>
+    </tr>
+    {{/if}}
     {{#each c in scheme.crosses}}
       {{> cross cross=c}}
     {{/each}}
+  </table>
   </div>
-
-  <div id="teal-title">
-    <h1 id="teal-title">Charts: </h1>
+  <div class="teal-title">
+    <h1 class="teal-title">Charts</h1>
   </div>
-  <div id="teal-list">
+  <div class="teal-list">
     {{#each o in scheme.outputs}}
       {{> chart chart=o}}
     {{/each}}
   </div>
 
 
+    <br/>
+    <br/>
+
+   <button class="btn btn-primary">Save</button>
+   <button class="btn btn-primary">Revert</button>
+   <button class="btn btn-primary">Save & Process</button>
 
     <br/>
     <br/>
     <br/>
     <br/>
-
-    Save :: Revert :: Process
-
+</div>
+</div>
 </template>
