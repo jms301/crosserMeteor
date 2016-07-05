@@ -42,13 +42,10 @@ Template.scheme.helpers({
 
 //Helper function to update the simulation resolution drop down & custom boxes
 var resetSimulationRes = function () {
-  console.log("resetting");
 
   tolerance = $('input#tolerance').val();
   minPlants = $('input#min-plants').val();
   chunkSize = $('input#chunk-size').val();
-
-  console.log(chunkSize);
 
   for (res in default_resolution) {
     if(chunkSize == default_resolution[res].convergence_chunk_size &&
@@ -69,13 +66,14 @@ var resetSimulationRes = function () {
 Template.scheme.onRendered(() => {
   /*self.autorun(() => {
     resetSimulationRes();
-    TODO this will not work till you remvoe auto-publish
+    TODO this will not work till you remvoe auto-publish since otherwise
+    no way to tell when the data is good
   });*/
 });
 
 Template.scheme.events({
   //Config:
-  "change select#species" : (evt, p) => {
+  "change select#species" : (evt, inst) => {
 
     Schemes.update({_id: FlowRouter.getParam('schemeId')},
      {$set : {species : default_species[evt.target.value]}});
@@ -117,7 +115,7 @@ Template.simulationResolution.onRendered(() => {
 });
 
 Template.simulationResolution.events({
-  "change select#resolution" : (evt, p) => {
+  "change select#resolution" : (evt, inst) => {
     if(evt.target.value == 'custom') {
 
 
@@ -160,7 +158,7 @@ Template.plant.events({
     toAdd = {};
     toAdd["plants."+inst.data.pi + ".loci"] = {
         "name" : "",
-        "type" : "",
+        "type" : "Marker",
         "location" : null,
         "linkage_group" : null};
     Schemes.update({_id: FlowRouter.getParam('schemeId')},
@@ -198,6 +196,39 @@ Template.loci.events({
     Schemes.update({_id: FlowRouter.getParam('schemeId')},
       {$set : toSet});
     //TODO Update the lists of Loci in crosses & Charts
+  },
+  "change select.loci-type" : (evt, inst) => {
+    toSet = {};
+    toSet["plants."+inst.data.pi + ".loci."+inst.data.li +
+      '.type'] = evt.target.value;
+
+    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+     {$set : toSet });
+
+  }
+
+});
+
+Template.loci.helpers({
+  "linkageGroupMax" : function () {
+    var schemeId = FlowRouter.getParam('schemeId');
+    var scheme = Schemes.findOne({_id: schemeId}) || false;
+
+    if(scheme)
+      return scheme.species.chromosome_lengths.length;
+    else
+      return "?";
+  },
+  "positionMax" : function (group) {
+    var schemeId = FlowRouter.getParam('schemeId');
+    var scheme = Schemes.findOne({_id: schemeId}) || false;
+    console.log(group);
+
+    if(scheme && group)
+      return scheme.species.chromosome_lengths[group];
+    else
+      return "?"
+
   }
 
 });

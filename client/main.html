@@ -107,14 +107,20 @@
 <template name="loci">
   <tr>
     <td><input class="loci-name" value="{{loci.name}}"/></td>
-    <td><select>
-      <option>Target Gene</option>
-      <option>Marker</option>
+    <td><select class="loci-type">
+      <option {{isSelected loci.type "Trait"}} value="Trait">Target Gene</option>
+      <option {{isSelected loci.type "Marker"}} value="Marker">Marker</option>
     <!--{{loci.type}}-->
     </select></td>
 
-    <td><input style="width:5em;" type="number" value = {{loci.linkage_group}} /></td>
-    <td><input style="width:5em;" type="number" value = {{loci.position}} /></td>
+    <td><input style="width:5em;" type="number" min=1
+               max={{linkageGroupMax}}
+               placeholder="1-{{linkageGroupMax}}"
+               value = {{loci.linkage_group}} /></td>
+    <td><input style="width:5em;" type="number" min=1
+               placeholder="1-{{positionMax loci.linkage_group}}"
+               max={{positionMax loci.linkage_group}}
+               value = {{loci.position}} /></td>
     <td><button class="delete-loci">X</button> </td>
 
   </tr>
