@@ -113,11 +113,11 @@
     <!--{{loci.type}}-->
     </select></td>
 
-    <td><input style="width:5em;" type="number" min=1
+    <td><input class="linkage-group" style="width:5em;" type="number" min=1
                max={{linkageGroupMax}}
                placeholder="1-{{linkageGroupMax}}"
                value = {{loci.linkage_group}} /></td>
-    <td><input style="width:5em;" type="number" min=1
+    <td><input class="position" style="width:5em;" type="number" min=1
                placeholder="1-{{positionMax loci.linkage_group}}"
                max={{positionMax loci.linkage_group}}
                value = {{loci.position}} /></td>
@@ -129,9 +129,31 @@
 <template name="cross">
   <tr>
     <td><input value="{{cross.name}}"></td>
-    <td><select class="rparent" >{{optionsForSelect cross}}</select>
+    <td><select class="rparent" >
+      <optgroup label = "Parents">
+        {{#each o in optionsPlantsForSelect}}
+          <option>{{o}}</option>
+        {{/each}}
+      </optgroup>
+      <optgroup label = "Crosses">
+        {{#each o in optionsCrossesForSelect}}
+          <option>{{o}}</option>
+        {{/each}}
+      </optgroup>
+    </select>
     </td>
-    <td><select class="lparent" >{{optionsForSelect cross}}</select>
+    <td><select class="lparent" >
+      <optgroup label = "Parents">
+        {{#each o in optionsPlantsForSelect}}
+          <option>{{o}}</option>
+        {{/each}}
+      </optgroup>
+      <optgroup label = "Crosses">
+        {{#each o in optionsCrossesForSelect}}
+          <option>{{o}}</option>
+        {{/each}}
+      </optgroup>
+    </select>
     </td>
     <td><select class="zygosity">
       <option {{isSelected cross.zygosity "Homozygous"}} value="Homozygous">Homozygous</option>
@@ -211,14 +233,14 @@
     {{#if scheme.crosses}}
     <tr>
     <th>Name:</th>
-    <th>Parent:</th>
-    <th>Parent:</th>
+    <th>L Parent:</th>
+    <th>R Parent:</th>
     <th>Selection Zygosity</th>
     <th>Loci To Select For:</th>
     </tr>
     {{/if}}
     {{#each c in scheme.crosses}}
-      {{> cross cross=c}}
+      {{> cross cross=c ci=@index}}
     {{/each}}
   </table>
   </div>

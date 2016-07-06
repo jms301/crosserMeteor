@@ -29,7 +29,6 @@ Template.scheme.helpers({
   },
   selectedSpecies: (species, currSpecies) => {
     return species.name == currSpecies ? "selected" : "";
-    //console.log(species.name);
 
   },
   speciesList: () => {
@@ -133,12 +132,39 @@ Template.simulationResolution.events({
   }
 });
 
+var crossChildren = function (cross, allCrosses) {
+  Schemes.findOne({_id: FlowRouter.getParam('schemeId')});
+
+  return [];
+};
+
+Template.cross.events({
+  "change select.zygosity": (evt, inst) =>
+  {
+    toSet = {};
+    toSet["crosses."+inst.data.ci + ".zygosity"] = evt.target.value;
+    console.log(toSet);
+    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+     {$set : toSet });
+
+  }
+});
+
 Template.cross.helpers({
-  optionsForSelect: (cross) => {
+  optionsPlantsForSelect: function () {
+    var scheme = Schemes.findOne({_id: FlowRouter.getParam('schemeId')});
+    return _.map(scheme.plants, (plant) => { return plant.name});
 
   },
+  optionsCrossesForSelect: function (cross) {
+    var scheme = Schemes.findOne({_id: FlowRouter.getParam('schemeId')});
+    var crosses = scheme.crosses;
+   // crossChildren =
+  },
+  availableLoci: function (cross) {
 
 
+  }
 });
 
 
@@ -205,7 +231,24 @@ Template.loci.events({
     Schemes.update({_id: FlowRouter.getParam('schemeId')},
      {$set : toSet });
 
+  },
+  "change input.linkage-group" : (evt, inst) => {
+    toSet = { };
+    toSet["plants."+inst.data.pi + ".loci."+inst.data.li +
+      '.linkage_group'] = evt.target.value;
+    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+     {$set : toSet });
+
+  },
+  "change input.position" : (evt, inst) => {
+    toSet = { };
+    toSet["plants."+inst.data.pi + ".loci."+inst.data.li +
+      '.position'] = evt.target.value;
+    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+     {$set : toSet });
+
   }
+
 
 });
 
@@ -222,13 +265,14 @@ Template.loci.helpers({
   "positionMax" : function (group) {
     var schemeId = FlowRouter.getParam('schemeId');
     var scheme = Schemes.findOne({_id: schemeId}) || false;
-    console.log(group);
 
     if(scheme && group)
-      return scheme.species.chromosome_lengths[group];
+      return scheme.species.chromosome_lengths[group-1];
     else
       return "?"
 
   }
 
 });
+
+
