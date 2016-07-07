@@ -128,7 +128,7 @@
 
 <template name="cross">
   <tr>
-    <td><input value="{{cross.name}}"></td>
+    <td><input class="cross-name" value="{{cross.name}}"></td>
     <td><select class="rparent" >
       <optgroup label = "Parents">
         {{#each o in optionsPlantsForSelect}}
@@ -136,7 +136,7 @@
         {{/each}}
       </optgroup>
       <optgroup label = "Crosses">
-        {{#each o in optionsCrossesForSelect}}
+        {{#each o in optionsCrossesForSelect cross}}
           <option>{{o}}</option>
         {{/each}}
       </optgroup>
@@ -149,7 +149,7 @@
         {{/each}}
       </optgroup>
       <optgroup label = "Crosses">
-        {{#each o in optionsCrossesForSelect}}
+        {{#each o in optionsCrossesForSelect cross}}
           <option>{{o}}</option>
         {{/each}}
       </optgroup>

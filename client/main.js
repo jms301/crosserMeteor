@@ -139,14 +139,28 @@ var crossChildren = function (cross, allCrosses) {
 };
 
 Template.cross.events({
-  "change select.zygosity": (evt, inst) =>
+
+  "change input.cross-name": (evt, inst) =>
   {
     toSet = {};
-    toSet["crosses."+inst.data.ci + ".zygosity"] = evt.target.value;
-    console.log(toSet);
+    toSet["crosses."+inst.data.ci + ".name"] = evt.target.value;
     Schemes.update({_id: FlowRouter.getParam('schemeId')},
      {$set : toSet });
 
+  },
+  "change select.lparent": (evt, inst) =>
+  {
+    toSet = {};
+    toSet["crosses."+inst.data.ci + ".left"] = evt.target.value;
+    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+     {$set : toSet });
+  },
+  "change select.rparent": (evt, inst) =>
+  {
+    toSet = {};
+    toSet["crosses."+inst.data.ci + ".right"] = evt.target.value;
+    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+     {$set : toSet });
   }
 });
 
@@ -157,9 +171,34 @@ Template.cross.helpers({
 
   },
   optionsCrossesForSelect: function (cross) {
+    if(!cross || !cross.name) {
+      return;
+    }
+
     var scheme = Schemes.findOne({_id: FlowRouter.getParam('schemeId')});
-    var crosses = scheme.crosses;
-   // crossChildren =
+    var toScan = [];
+    var descFound = [];
+    toScan.push(cross.name);
+
+    while(toScan.length > 0) {
+      var lookAt = toScan.pop();
+      descFound.push(lookAt);
+      scheme.crosses.forEach((c,i,crosses) => {
+        if(c.left == lookAt || c.right == lookAt) {
+          console.log(lookAt + " : " + c.left + " : " + c.right);
+          toScan.push(c.name)
+        }
+      });
+    }
+
+    toRet = _.map(scheme.crosses, (c) => { return c.name});
+    toRet = _.filter(toRet, (item, index, list)=> {
+
+      return !_.contains(descFound, item)
+
+    });
+    return(toRet);
+
   },
   availableLoci: function (cross) {
 
