@@ -132,12 +132,12 @@
     <td><select class="rparent" >
       <optgroup label = "Parents">
         {{#each o in optionsPlantsForSelect}}
-          <option>{{o}}</option>
+          <option {{isSelected o cross.right}}>{{o}}</option>
         {{/each}}
       </optgroup>
       <optgroup label = "Crosses">
         {{#each o in optionsCrossesForSelect cross}}
-          <option>{{o}}</option>
+          <option {{isSelected o cross.right}}>{{o}}</option>
         {{/each}}
       </optgroup>
     </select>
@@ -145,12 +145,12 @@
     <td><select class="lparent" >
       <optgroup label = "Parents">
         {{#each o in optionsPlantsForSelect}}
-          <option>{{o}}</option>
+          <option {{isSelected o cross.left}}>{{o}}</option>
         {{/each}}
       </optgroup>
       <optgroup label = "Crosses">
         {{#each o in optionsCrossesForSelect cross}}
-          <option>{{o}}</option>
+          <option {{isSelected o cross.left}}>{{o}}</option>
         {{/each}}
       </optgroup>
     </select>
@@ -162,14 +162,24 @@
     </td>
     <td>
     {{#each l in cross.loci}}
-      {{>CrossLoci loci=l}}
+      {{> crossLoci loci=l ci=ci}}
     {{/each}}
+    </td>
+    <td>
+    <select class="add-loci">
+    <option selected disabled value="default">Add:</option>
+    {{#each l in optionsAvailableLoci cross}}
+    <option>
+      {{l.name}}
+    </option>
+    {{/each}}
+    </select>
     </td>
   </tr>
 </template>
 
-<template name="CrossLoci">
-  <span> {{loci}} <span>X</span></span>
+<template name="crossLoci">
+  <span> {{loci}} <button class="delete-loci">X</button></span>
 </template>
 
 <template name="chart">
@@ -188,6 +198,7 @@
 
 
 <template name="scheme">
+{{#if Template.subscriptionsReady}}
 <div class="row">
 <div class="col-md-12">
   <h1>Edit Scheme: {{scheme.name}}</h1>
@@ -267,4 +278,5 @@
     <br/>
 </div>
 </div>
+{{/if}}
 </template>

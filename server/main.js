@@ -11,3 +11,6 @@ Meteor.startup(() => {
 
 });
 
+Meteor.publish('scheme', function (id) {
+  return Schemes.find({_id: id});
+});

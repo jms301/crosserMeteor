@@ -4,6 +4,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.min.js';
 import {default_resolution} from './imports/default.js';
 import {default_species} from './imports/default.js';
+import {CrossTree} from './imports/crosstree.js';
+
+var CTree = {};
 
 Template.registerHelper("isSelected", (val, val2) => {
   if (val == val2)
@@ -14,12 +17,17 @@ Template.registerHelper("isSelected", (val, val2) => {
 
 Template.scheme.onCreated(function () {
   var self = this;
-
   self.autorun(function () {
     var schemeId = FlowRouter.getParam('schemeId');
-    //TODO add subscription here!
+    self.subscribe('scheme', schemeId);
+
+    if(self.subscriptionsReady()) {
+      scheme = Schemes.findOne({_id: schemeId});
+      CTree = new CrossTree(scheme.plants, scheme.crosses);
+    }
   });
 });
+
 
 Template.scheme.helpers({
   scheme: () => {
@@ -81,21 +89,21 @@ Template.scheme.events({
 
   },
   "change input#chunk-size" : (evt, inst) => {
-    toSet = {};
+    var toSet = {};
     toSet['system.convergence_chunk_size'] = evt.target.value;
     Schemes.update({_id: FlowRouter.getParam('schemeId')},
      {$set : toSet});
     resetSimulationRes();
   },
   "change input#tolerance" : (evt, inst) => {
-    toSet = {};
+    var toSet = {};
     toSet['system.convergence_tolerance'] = evt.target.value;
     Schemes.update({_id: FlowRouter.getParam('schemeId')},
      {$set : toSet});
     resetSimulationRes();
   },
   "change input#min-plants" : (evt, inst) => {
-    toSet = {};
+    var toSet = {};
     toSet['system.convergence_fewest_plants'] = evt.target.value;
     Schemes.update({_id: FlowRouter.getParam('schemeId')},
      {$set : toSet});
@@ -132,17 +140,20 @@ Template.simulationResolution.events({
   }
 });
 
-var crossChildren = function (cross, allCrosses) {
-  Schemes.findOne({_id: FlowRouter.getParam('schemeId')});
-
-  return [];
-};
-
 Template.cross.events({
+  "change select.add-loci" : function (evt, inst) {
+    var schemeId = FlowRouter.getParam('schemeId');
+    var toSet = { };
+    toSet["crosses."+this.ci + ".loci"] = evt.target.value;
+    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+      {$push: toSet});
 
+    inst.$('select.add-loci').val("default");
+
+  },
   "change input.cross-name": (evt, inst) =>
   {
-    toSet = {};
+    var toSet = {};
     toSet["crosses."+inst.data.ci + ".name"] = evt.target.value;
     Schemes.update({_id: FlowRouter.getParam('schemeId')},
      {$set : toSet });
@@ -150,14 +161,14 @@ Template.cross.events({
   },
   "change select.lparent": (evt, inst) =>
   {
-    toSet = {};
+    var toSet = {};
     toSet["crosses."+inst.data.ci + ".left"] = evt.target.value;
     Schemes.update({_id: FlowRouter.getParam('schemeId')},
      {$set : toSet });
   },
   "change select.rparent": (evt, inst) =>
   {
-    toSet = {};
+    var toSet = {};
     toSet["crosses."+inst.data.ci + ".right"] = evt.target.value;
     Schemes.update({_id: FlowRouter.getParam('schemeId')},
      {$set : toSet });
@@ -176,33 +187,31 @@ Template.cross.helpers({
     }
 
     var scheme = Schemes.findOne({_id: FlowRouter.getParam('schemeId')});
-    var toScan = [];
-    var descFound = [];
-    toScan.push(cross.name);
+    var toRet = _.map(scheme.crosses, (c) => { return c.name});
 
-    while(toScan.length > 0) {
-      var lookAt = toScan.pop();
-      descFound.push(lookAt);
-      scheme.crosses.forEach((c,i,crosses) => {
-        if(c.left == lookAt || c.right == lookAt) {
-          console.log(lookAt + " : " + c.left + " : " + c.right);
-          toScan.push(c.name)
-        }
-      });
+    if(Template.instance().subscriptionsReady())
+    {
+      descFound = CTree.getDescendants(cross);
     }
-
-    toRet = _.map(scheme.crosses, (c) => { return c.name});
     toRet = _.filter(toRet, (item, index, list)=> {
 
-      return !_.contains(descFound, item)
+      return !_.contains(descFound, item);
 
     });
-    return(toRet);
+    return toRet;
 
   },
-  availableLoci: function (cross) {
 
+  optionsAvailableLoci: function (cross) {
+    var toRet = _.uniq(CTree.availableLoci(cross));
 
+    console.log(toRet);
+    console.log(cross.loci);
+
+    toRet = _.filter(toRet, (item) => {
+      return !_.contains(cross.loci, item.name);
+    });
+    return toRet;
   }
 });
 
@@ -230,7 +239,7 @@ Template.plant.events({
       {$push : toAdd});
   },
   "change input.parent-name" : (evt, inst) => {
-    toSet = {};
+    var toSet = {};
     toSet["plants."+inst.data.pi + ".name"] = evt.target.value;
     Schemes.update({_id: FlowRouter.getParam('schemeId')},
       {$set : toSet});
@@ -255,7 +264,7 @@ Template.loci.events({
 
   },
   "change input.loci-name" : (evt, inst) => {
-    toSet = {};
+    var toSet = {};
     toSet["plants."+inst.data.pi + ".loci."+inst.data.li +
       ".name"] = evt.target.value;
     Schemes.update({_id: FlowRouter.getParam('schemeId')},
@@ -263,7 +272,7 @@ Template.loci.events({
     //TODO Update the lists of Loci in crosses & Charts
   },
   "change select.loci-type" : (evt, inst) => {
-    toSet = {};
+    var toSet = {};
     toSet["plants."+inst.data.pi + ".loci."+inst.data.li +
       '.type'] = evt.target.value;
 
@@ -272,7 +281,7 @@ Template.loci.events({
 
   },
   "change input.linkage-group" : (evt, inst) => {
-    toSet = { };
+    var toSet = { };
     toSet["plants."+inst.data.pi + ".loci."+inst.data.li +
       '.linkage_group'] = evt.target.value;
     Schemes.update({_id: FlowRouter.getParam('schemeId')},
@@ -280,7 +289,7 @@ Template.loci.events({
 
   },
   "change input.position" : (evt, inst) => {
-    toSet = { };
+    var toSet = { };
     toSet["plants."+inst.data.pi + ".loci."+inst.data.li +
       '.position'] = evt.target.value;
     Schemes.update({_id: FlowRouter.getParam('schemeId')},
@@ -314,4 +323,17 @@ Template.loci.helpers({
 
 });
 
+Template.crossLoci.events({
+  "click button.delete-loci" : function (evt, inst) {
 
+    var schemeId = FlowRouter.getParam('schemeId');
+    var toSet = { };
+    toSet["crosses."+this.ci + ".loci"] = this.loci;
+    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+      {$pull: toSet});
+
+
+  },
+
+
+});
