@@ -29,8 +29,9 @@ function processScheme(task, callback) {
   fs.mkdir(outputdir, mask, (err) => {
     if (!err || err.code == 'EEXIST') {
 
-      task.child = spawn(cr_exe , ['-o' + outputdir, '-u http://127.0.0.1:3000/scheme/' + task._id], {"cwd": cr_exe_dir});
+      task.child = spawn(cr_exe , ['-o' + outputdir, '-u http://127.0.0.1:3000/api/' + task._id], {"cwd": cr_exe_dir});
 
+      console.log("#### API URL: http://127.0.0.1:3000/api/" + task._id);
 
       var stdOut = "";
       var stdErr = "";
@@ -82,3 +83,10 @@ var queue = async.queue(processScheme, 1);
 
 //queue.push({name: "wibble", _id: "5761067fc5b613e16e7a81e7"}, (err) => { });
 
+
+Meteor.methods({
+  'processScheme' : function (schemeId) {
+    queue.push({name: "TestScheme", _id: schemeId}, (err) => {console.log(err)});
+
+  }
+});

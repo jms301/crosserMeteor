@@ -110,7 +110,7 @@ Template.scheme.events({
     Schemes.update({_id: FlowRouter.getParam('schemeId')},
       {$push : {'plants': {'name':'', 'loci' : []}}});
   },
-
+  //Crosses:
   "click button#add-cross" : () => {
     Schemes.update({_id: FlowRouter.getParam('schemeId')},
       {$push : {'crosses': {'name':'',
@@ -123,9 +123,15 @@ Template.scheme.events({
 
 
   },
+  //charts
   "click button#add-chart" : () => {
     Schemes.update({_id: FlowRouter.getParam('schemeId')},
       {$push : {'outputs': {'name':'', 'data' : '' }}});
+  },
+  //Save&process
+  "click button#process" : function (evt, inst) {
+    Meteor.call('processScheme', FlowRouter.getParam('schemeId'));
+
   }
 });
 
