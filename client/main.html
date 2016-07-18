@@ -173,7 +173,13 @@
       {{l.name}}
     </option>
     {{/each}}
+    <option value="add-all-ZTU2YTdkODc4Njk0NDk0NGNhNzc5ZjFi">
+      Add All
+    </option>
     </select>
+    </td>
+    <td>
+    <button class="delete-cross">X</button>
     </td>
   </tr>
 </template>
@@ -184,15 +190,22 @@
 
 <template name="chart">
   <div class="teal-item">
-    <select class="type">
-      <option {{isSelected chart.type "success_table"}}>Success Table</option>
-      <option {{isSelected chart.type "loci_composition"}}>Loci Composition</option>
-      <option {{isSelected chart.type "proportion_distribution"}}>Proportion Distribution</option>
-      <option {{isSelected chart.type "mean_cross_composition"}}>Mean Cross Composition</option>
-      <option {{isSelected chart.type "custom"}}>Custom</option>
+    <select class="chart-type">
+      <option value="success_table"
+      {{isSelected chart.type "success_table"}}>Success Table</option>
+      <option value="loci_composition"
+      {{isSelected chart.type "loci_composition"}}>Loci Composition</option>
+      <option value="proportion_distribution"
+      {{isSelected chart.type "proportion_distribution"}}>Proportion Distribution</option>
+      <option value="mean_cross_composition"
+      {{isSelected chart.type "mean_cross_composition"}}>Mean Cross Composition</option>
+      <option value="custom"
+      {{isSelected chart.type "custom"}}>Custom</option>
     </select>
 
-    <input value="{{chart.data}}" />
+    <input value="{{chart.data}}" class="chart-custom" />
+
+    <button class="chart-delete">X</button>
   </div>
 </template>
 
@@ -212,7 +225,7 @@
 		<select id="species">
 			{{#each species in speciesList}}
 			<option value='{{species.value}}'
-				{{selectedSpecies species scheme.species.name}}
+				{{isSelected species.name scheme.species.name}}
 			>{{species.name}}</option>
 
 			{{/each}}
@@ -253,6 +266,13 @@
     {{#each c in scheme.crosses}}
       {{> cross cross=c ci=@index}}
     {{/each}}
+
+    <tr>
+    <td></td>
+    <td>
+      <button id="add-cross">+ add cross</button>
+    </td>
+    </tr>
   </table>
   </div>
   <div class="teal-title">
@@ -260,22 +280,23 @@
   </div>
   <div class="teal-list">
     {{#each o in scheme.outputs}}
-      {{> chart chart=o}}
+      {{> chart chart=o chi=@index}}
     {{/each}}
+    <div class="teal-item">
+      <button id="add-chart">+ add chart</button>
+    </div>
   </div>
+  <br/>
+  <br/>
 
+  <button class="btn btn-primary">Save</button>
+  <button class="btn btn-primary">Revert</button>
+  <button class="btn btn-primary">Save & Process</button>
 
-    <br/>
-    <br/>
-
-   <button class="btn btn-primary">Save</button>
-   <button class="btn btn-primary">Revert</button>
-   <button class="btn btn-primary">Save & Process</button>
-
-    <br/>
-    <br/>
-    <br/>
-    <br/>
+  <br/>
+  <br/>
+  <br/>
+  <br/>
 </div>
 </div>
 {{/if}}

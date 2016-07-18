@@ -13,12 +13,29 @@ export var CrossTree = function CrossTree(plants, crosses) {
 
   crosses.forEach((cross) => {
     if(cross.name) {
-
       if (cross.left && this._nodes[cross.left]) {
+        if(this._nodes[cross.name] === this._nodes[cross.left])  {
+          console.log("about to asign self as lparent! wat?!");
+          console.log("name: " + cross.name);
+          console.log(cross);
+
+        }
+
+
         this._nodes[cross.name].lParent = this._nodes[cross.left];
         this._nodes[cross.left].children.push(this._nodes[cross.name]);
       }
       if (cross.right && this._nodes[cross.right]) {
+        if(this._nodes[cross.name] === this._nodes[cross.right])  {
+          console.log("about to asign self as rparent! wat?!");
+          console.log("name: " + cross.name);
+          console.log(cross);
+
+        }
+
+
+
+
         this._nodes[cross.name].rParent = this._nodes[cross.right];
         this._nodes[cross.right].children.push(this._nodes[cross.name]);
       }
@@ -46,6 +63,7 @@ CrossTree.prototype.getDescendants = function (cross) {
     loopWarning++;
     if(loopWarning > 1000) {
       console.log("loop in cross tree!");
+      console.log(this._nodes);
       break;
     }
   }

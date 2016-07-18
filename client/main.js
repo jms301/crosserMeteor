@@ -35,10 +35,6 @@ Template.scheme.helpers({
     var scheme = Schemes.findOne({_id: schemeId}) || {};
     return scheme;
   },
-  selectedSpecies: (species, currSpecies) => {
-    return species.name == currSpecies ? "selected" : "";
-
-  },
   speciesList: () => {
     return _.map(default_species , (val, key, list) => {
       return {name: val.name, value: key};
@@ -113,6 +109,23 @@ Template.scheme.events({
   "click button#add-parent" : () => {
     Schemes.update({_id: FlowRouter.getParam('schemeId')},
       {$push : {'plants': {'name':'', 'loci' : []}}});
+  },
+
+  "click button#add-cross" : () => {
+    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+      {$push : {'crosses': {'name':'',
+                            'left' : null,
+                            'right': null,
+                            'loci' : [],
+                            'zygosity' : 'Heterozygous'}}
+      }
+    );
+
+
+  },
+  "click button#add-chart" : () => {
+    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+      {$push : {'outputs': {'name':'', 'data' : '' }}});
   }
 });
 
@@ -141,22 +154,81 @@ Template.simulationResolution.events({
 });
 
 Template.cross.events({
+
+ "click button.delete-cross" : function (evt, inst) {
+
+    var old = Schemes.findOne({_id: FlowRouter.getParam('schemeId')});
+    var oldName = this.cross.name;// old.crosses[inst.data.ci].name;
+
+    //TODO remove cross from charts.
+
+    old.crosses.forEach((cross) => {
+      if(cross.left == oldName)
+        cross.left = "";
+      if(cross.right == oldName)
+        cross.right = "";
+    });
+
+    old.crosses.splice(this.ci, 1);
+
+    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+     {$set : {crosses:  old.crosses}});
+
+  },
+  "change select.zygosity" : function (evt, inst) {
+    var toSet = {};
+    toSet["crosses."+inst.data.ci + ".zygosity"] = evt.target.value;
+    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+     {$set : toSet });
+
+  },
   "change select.add-loci" : function (evt, inst) {
     var schemeId = FlowRouter.getParam('schemeId');
     var toSet = { };
-    toSet["crosses."+this.ci + ".loci"] = evt.target.value;
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
-      {$push: toSet});
 
+    if(evt.target.value == "add-all-ZTU2YTdkODc4Njk0NDk0NGNhNzc5ZjFi") {
+      //Get all anscestors loci.
+      var loci = _.uniq(CTree.availableLoci(this.cross));
+      loci.forEach((loci) => {
+        toSet["crosses."+this.ci + ".loci"] = loci.name;
+        Schemes.update({_id: schemeId},
+          {$addToSet: toSet});
+      });
+
+    } else {
+      // normal loci select
+
+      toSet["crosses."+this.ci + ".loci"] = evt.target.value;
+
+      //Update the DB
+      Schemes.update({_id: schemeId},
+        {$addToSet: toSet});
+
+    }
+
+    //reset the drop down.
     inst.$('select.add-loci').val("default");
 
   },
-  "change input.cross-name": (evt, inst) =>
-  {
-    var toSet = {};
-    toSet["crosses."+inst.data.ci + ".name"] = evt.target.value;
+  "change input.cross-name": function (evt, inst) {
+
+    var old = Schemes.findOne({_id: FlowRouter.getParam('schemeId')});
+    var oldName = old.crosses[inst.data.ci].name;
+    var newName = evt.target.value;
+
+    //TODO updated charts with new cross names.
+    //TODO barf if name already in use in cross OR plants.
+
+    old.crosses.forEach((cross) => {
+      if(cross.left == oldName)
+        cross.left = newName;
+      if(cross.right == oldName)
+        cross.right = newName;
+    });
+    old.crosses[inst.data.ci].name = newName;
+
     Schemes.update({_id: FlowRouter.getParam('schemeId')},
-     {$set : toSet });
+     {$set : {crosses:  old.crosses}});
 
   },
   "change select.lparent": (evt, inst) =>
@@ -205,9 +277,6 @@ Template.cross.helpers({
   optionsAvailableLoci: function (cross) {
     var toRet = _.uniq(CTree.availableLoci(cross));
 
-    console.log(toRet);
-    console.log(cross.loci);
-
     toRet = _.filter(toRet, (item) => {
       return !_.contains(cross.loci, item.name);
     });
@@ -239,6 +308,23 @@ Template.plant.events({
       {$push : toAdd});
   },
   "change input.parent-name" : (evt, inst) => {
+    var old = Schemes.findOne({_id: FlowRouter.getParam('schemeId')});
+    var oldName = old.plants[inst.data.pi].name;
+    var newName = evt.target.value;
+
+    //TODO barf if name already in use in cross OR plants.
+    //TODO update chart 'donor' fields.
+    //TODO should re-factor into function?
+    old.crosses.forEach((cross) => {
+      if(cross.left == oldName)
+        cross.left = newName;
+      if(cross.right == oldName)
+        cross.right = newName;
+    });
+
+    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+     {$set : {crosses:  old.crosses}});
+
     var toSet = {};
     toSet["plants."+inst.data.pi + ".name"] = evt.target.value;
     Schemes.update({_id: FlowRouter.getParam('schemeId')},
@@ -264,6 +350,22 @@ Template.loci.events({
 
   },
   "change input.loci-name" : (evt, inst) => {
+    var old = Schemes.findOne({_id: FlowRouter.getParam('schemeId')});
+    var oldName = old.plants[inst.data.pi].loci[inst.data.li].name;
+    var newName = evt.target.value;
+
+    //TODO barf if name already in use in loci
+    //TODO update chart 'donor' fields.
+    //TODO should re-factor into function?
+    old.crosses.forEach((cross) => {
+      var i = _.indexOf(cross.loci, oldName, false);
+      if(i)
+        cross.loci[i] = newName;
+    });
+
+    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+     {$set : {crosses:  old.crosses}});
+
     var toSet = {};
     toSet["plants."+inst.data.pi + ".loci."+inst.data.li +
       ".name"] = evt.target.value;
@@ -332,6 +434,37 @@ Template.crossLoci.events({
     Schemes.update({_id: FlowRouter.getParam('schemeId')},
       {$pull: toSet});
 
+
+  },
+
+
+});
+
+
+Template.chart.events({
+  "change select.chart-type" : function (evt, inst) {
+
+    toSet = {};
+    toSet["outputs."+ this.chi + ".type"] = evt.target.value;
+
+    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+     {$set : toSet});
+
+  },
+  "change input.chart-custom" : function (evt, inst) {
+    toSet = {};
+    toSet["outputs."+ this.chi + ".data"] = evt.target.value;
+    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+     {$set : toSet});
+  },
+ "click button.chart-delete" : function (evt, inst) {
+
+    toDel = {};
+    toDel["outputs."+inst.data.chi] = "";
+    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+      {$unset: toDel});
+    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+      {$pull: {"outputs" : null }});
 
   },
 
