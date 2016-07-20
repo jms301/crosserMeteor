@@ -1,16 +1,8 @@
-import { Meteor } from 'meteor/meteor';
+//Just define the route for the scheme API to serve data to crosser.
+import '../imports/api/server/scheme_api.js';
 
-Meteor.startup(() => {
+//Setup the QUEUE and create the process_scheme meteor method.
+import '../imports/server/process_scheme.js';
 
-  WebApp.addHtmlAttributeHook( () => {
-    return {lang : "en"};
-  });
-
-  // code to run on server at startup
-
-
-});
-
-Meteor.publish('scheme', function (id) {
-  return Schemes.find({_id: id});
-});
+//Setup the app
+import '../imports/startup/server/index.js';

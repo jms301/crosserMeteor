@@ -81,12 +81,11 @@ function processScheme(task, callback) {
 
 var queue = async.queue(processScheme, 1);
 
-//queue.push({name: "wibble", _id: "5761067fc5b613e16e7a81e7"}, (err) => { });
-
-
 Meteor.methods({
   'processScheme' : function (schemeId) {
-    queue.push({name: "TestScheme", _id: schemeId}, (err) => {console.log(err)});
+    queue.push({name: "TestScheme", _id: schemeId}, (err) => {
+      //TODO deal with errors more gracefully.
+      console.log(err)});
 
   }
 });
