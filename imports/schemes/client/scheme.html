@@ -1,0 +1,250 @@
+<template name="simulationResolution">
+
+    <h3>Simulation Resolution:</h3>
+      <select id="resolution">
+        <option value="draft">Draft (Very Low)</option>
+        <option value="low">Low</option>
+        <option value="high">High</option>
+        <option value="custom">Custom</option>
+
+		</select>
+
+
+
+
+      <div>Chunk Size: <input id="chunk-size" value="{{convergence_chunk_size}}"/></div>
+      <div>Tolerance:  <input id="tolerance" value="{{convergence_tolerance}}"/></div>
+      <div>Min Plants: <input id="min-plants" value="{{convergence_fewest_plants}}"/></div>
+
+</template>
+
+<template name="plant">
+  <div class="teal-item">
+  <h3 class="item-title inline-h"> Parent name:</h3> <input class="parent-name" value="{{plant.name}}"/><button class="delete-parent">X</button>
+
+  <div class="orange-title">
+    <h4 class="orange-title">
+      Loci:
+    </h4>
+  </div>
+  <div class="orange-list">
+  <table>
+    {{#if plant.loci}}
+    <tr>
+      <th>Name:</th>
+      <th>Type</th>
+      <th>Linkage Group /<br/>
+       Chromosome</th>
+      <th>Position</th>
+      <th></th>
+    </tr>
+    {{/if}}
+    {{#each l in plant.loci}}
+      {{> loci loci=l li=@index pi=pi}}
+    {{/each}}
+
+    </table>
+    <div class="orange-item">
+      <button class="add-locus">+ Add Locus</button>
+    </div>
+  </div>
+  </div>
+</template>
+
+<template name="loci">
+  <tr>
+    <td><input class="loci-name" value="{{loci.name}}"/></td>
+    <td><select class="loci-type">
+      <option {{isSelected loci.type "Trait"}} value="Trait">Target Gene</option>
+      <option {{isSelected loci.type "Marker"}} value="Marker">Marker</option>
+    <!--{{loci.type}}-->
+    </select></td>
+
+    <td><input class="linkage-group" style="width:5em;" type="number" min=1
+               max={{linkageGroupMax}}
+               placeholder="1-{{linkageGroupMax}}"
+               value = {{loci.linkage_group}} /></td>
+    <td><input class="position" style="width:5em;" type="number" min=1
+               placeholder="1-{{positionMax loci.linkage_group}}"
+               max={{positionMax loci.linkage_group}}
+               value = {{loci.position}} /></td>
+    <td><button class="delete-loci">X</button> </td>
+
+  </tr>
+</template>
+
+<template name="cross">
+  <tr>
+    <td><input class="cross-name" value="{{cross.name}}"></td>
+    <td><select class="rparent" >
+      <optgroup label = "Parents">
+        {{#each o in optionsPlantsForSelect}}
+          <option {{isSelected o cross.right}}>{{o}}</option>
+        {{/each}}
+      </optgroup>
+      <optgroup label = "Crosses">
+        {{#each o in optionsCrossesForSelect cross}}
+          <option {{isSelected o cross.right}}>{{o}}</option>
+        {{/each}}
+      </optgroup>
+    </select>
+    </td>
+    <td><select class="lparent" >
+      <optgroup label = "Parents">
+        {{#each o in optionsPlantsForSelect}}
+          <option {{isSelected o cross.left}}>{{o}}</option>
+        {{/each}}
+      </optgroup>
+      <optgroup label = "Crosses">
+        {{#each o in optionsCrossesForSelect cross}}
+          <option {{isSelected o cross.left}}>{{o}}</option>
+        {{/each}}
+      </optgroup>
+    </select>
+    </td>
+    <td><select class="zygosity">
+      <option {{isSelected cross.zygosity "Homozygous"}} value="Homozygous">Homozygous</option>
+      <option {{isSelected cross.zygosity "Heterozygous"}} value="Heterozygous">Heterozygous</option>
+    </select>
+    </td>
+    <td>
+    {{#each l in cross.loci}}
+      {{> crossLoci loci=l ci=ci}}
+    {{/each}}
+    </td>
+    <td>
+    <select class="add-loci">
+    <option selected disabled value="default">Add:</option>
+    {{#each l in optionsAvailableLoci cross}}
+    <option>
+      {{l.name}}
+    </option>
+    {{/each}}
+    <option value="add-all-ZTU2YTdkODc4Njk0NDk0NGNhNzc5ZjFi">
+      Add All
+    </option>
+    </select>
+    </td>
+    <td>
+    <button class="delete-cross">X</button>
+    </td>
+  </tr>
+</template>
+
+<template name="crossLoci">
+  <span> {{loci}} <button class="delete-loci">X</button></span>
+</template>
+
+<template name="chart">
+  <div class="teal-item">
+    <select class="chart-type">
+      <option value="success_table"
+      {{isSelected chart.type "success_table"}}>Success Table</option>
+      <option value="loci_composition"
+      {{isSelected chart.type "loci_composition"}}>Loci Composition</option>
+      <option value="proportion_distribution"
+      {{isSelected chart.type "proportion_distribution"}}>Proportion Distribution</option>
+      <option value="mean_cross_composition"
+      {{isSelected chart.type "mean_cross_composition"}}>Mean Cross Composition</option>
+      <option value="custom"
+      {{isSelected chart.type "custom"}}>Custom</option>
+    </select>
+
+    <input value="{{chart.data}}" class="chart-custom" />
+
+    <button class="chart-delete">X</button>
+  </div>
+</template>
+
+
+<template name="scheme">
+{{#if Template.subscriptionsReady}}
+<div class="row">
+<div class="col-md-12">
+  <h1>Edit Scheme: {{scheme.name}}</h1>
+
+  <div class="teal-title">
+    <h1 class="teal-title">Config</h1>
+  </div>
+
+  <div class="teal-list teal-no-item">
+    <h3 >Species:</h3>
+		<select id="species">
+			{{#each species in speciesList}}
+			<option value='{{species.value}}'
+				{{isSelected species.name scheme.species.name}}
+			>{{species.name}}</option>
+
+			{{/each}}
+		</select>
+
+      {{> simulationResolution scheme.system }}
+
+  </div>
+
+  <div class="teal-title">
+    <h1 class="teal-title">Parents</h1>
+  </div>
+  <div class="teal-list">
+
+    {{#each p in scheme.plants}}
+      {{> plant plant=p pi=@index}}
+    {{/each}}
+    <div class="teal-item">
+      <button id="add-parent">+ add parent</button>
+    </div>
+  </div>
+
+  <div class="teal-title">
+    <h1 class="teal-title">Crosses</h1>
+  </div>
+
+  <div class="teal-list">
+  <table>
+    {{#if scheme.crosses}}
+    <tr>
+    <th>Name:</th>
+    <th>L Parent:</th>
+    <th>R Parent:</th>
+    <th>Selection Zygosity</th>
+    <th>Loci To Select For:</th>
+    </tr>
+    {{/if}}
+    {{#each c in scheme.crosses}}
+      {{> cross cross=c ci=@index}}
+    {{/each}}
+
+    <tr>
+    <td></td>
+    <td>
+      <button id="add-cross">+ add cross</button>
+    </td>
+    </tr>
+  </table>
+  </div>
+  <div class="teal-title">
+    <h1 class="teal-title">Charts</h1>
+  </div>
+  <div class="teal-list">
+    {{#each o in scheme.outputs}}
+      {{> chart chart=o chi=@index}}
+    {{/each}}
+    <div class="teal-item">
+      <button id="add-chart">+ add chart</button>
+    </div>
+  </div>
+  <br/>
+  <br/>
+
+  <button class="btn btn-primary">Save</button>
+  <button class="btn btn-primary">Revert</button>
+  <button class="btn btn-primary" id="process">Save & Process</button>
+
+  <br/>
+  <br/>
+  <br/>
+  <br/>
+</div>
+</div>
+{{/if}}
+</template>
