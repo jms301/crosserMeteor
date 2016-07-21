@@ -15,20 +15,20 @@ FlowRouter.route('/scheme/:schemeId', {
 FlowRouter.route('/calculation/:calcId', {
   name: 'calculation',
   action: function() {
-    BlazeLayout.render("mainLayout", {content: "scheme"});
+    BlazeLayout.render("mainLayout", {content: "calculation"});
   }
 });
 
-FlowRouter.route('/schemes/', {
+FlowRouter.route('/schemes', {
   name: 'schemes',
   action: function() {
     BlazeLayout.render("mainLayout", {content: "scheme"});
   }
 });
 
-FlowRouter.route('/calculations/', {
+FlowRouter.route('/calculations', {
   name: 'calculations',
   action: function() {
-    BlazeLayout.render("mainLayout", {content: "scheme"});
+    BlazeLayout.render("mainLayout", {content: "calculations"});
   }
 });
