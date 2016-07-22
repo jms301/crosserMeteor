@@ -8,17 +8,42 @@ import {CrossTree} from './crosstree.js';
 
 var CTree = {};
 
+
+
 Template.registerHelper("isSelected", (val, val2) => {
   if (val == val2)
     return "selected"
   return ""
 });
 
+//helper to simply use FlowRouter.path
+Template.registerHelper("flowPath", (name, id) => {
+
+  return FlowRouter.path(name, {id: id}, {});
+
+});
+
+Template.schemes.onCreated(function () {
+  var self = this;
+  self.autorun(function () {
+    self.subscribe('schemes');
+      console.log(Schemes.find().count());
+    /*if(self.subscriptionsReady()) {
+    }*/
+  });
+});
+
+
+Template.schemes.helpers({
+  schemeList: () => {
+      return Schemes.find();
+    }
+});
 
 Template.scheme.onCreated(function () {
   var self = this;
   self.autorun(function () {
-    var schemeId = FlowRouter.getParam('schemeId');
+    var schemeId = FlowRouter.getParam('id');
     self.subscribe('scheme', schemeId);
 
     if(self.subscriptionsReady()) {
@@ -31,7 +56,7 @@ Template.scheme.onCreated(function () {
 
 Template.scheme.helpers({
   scheme: () => {
-    var schemeId = FlowRouter.getParam('schemeId');
+    var schemeId = FlowRouter.getParam('id');
     var scheme = Schemes.findOne({_id: schemeId}) || {};
     return scheme;
   },
@@ -78,7 +103,7 @@ Template.scheme.events({
   //Config:
   "change select#species" : (evt, inst) => {
 
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
      {$set : {species : default_species[evt.target.value]}});
 
     //TODO refresh loci settings
@@ -87,32 +112,32 @@ Template.scheme.events({
   "change input#chunk-size" : (evt, inst) => {
     var toSet = {};
     toSet['system.convergence_chunk_size'] = evt.target.value;
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
      {$set : toSet});
     resetSimulationRes();
   },
   "change input#tolerance" : (evt, inst) => {
     var toSet = {};
     toSet['system.convergence_tolerance'] = evt.target.value;
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
      {$set : toSet});
     resetSimulationRes();
   },
   "change input#min-plants" : (evt, inst) => {
     var toSet = {};
     toSet['system.convergence_fewest_plants'] = evt.target.value;
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
      {$set : toSet});
     resetSimulationRes();
   },
   //Plants:
   "click button#add-parent" : () => {
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
       {$push : {'plants': {'name':'', 'loci' : []}}});
   },
   //Crosses:
   "click button#add-cross" : () => {
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
       {$push : {'crosses': {'name':'',
                             'left' : null,
                             'right': null,
@@ -125,22 +150,25 @@ Template.scheme.events({
   },
   //charts
   "click button#add-chart" : () => {
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
       {$push : {'outputs': {'name':'', 'data' : '' }}});
   },
-  //Save&process
-  "click button#save": function (evt, inst) {
+  //backup, revert & process
+
+  "click button#backup": function (evt, inst) {
+    Meteor.call('backupScheme', FlowRouter.getParam('id'));
+
+  },
+  "click button#revert": function (evt, inst) {
+    //TODO confirm!
+
+    Meteor.call('revertScheme', FlowRouter.getParam('id'));
 
   },
   "click button#process" : function (evt, inst) {
-    Meteor.call('processScheme', FlowRouter.getParam('schemeId'));
+    Meteor.call('processScheme', FlowRouter.getParam('id'));
 
   }
-});
-
-Template.simulationResolution.onRendered(() => {
-
-
 });
 
 Template.simulationResolution.events({
@@ -151,7 +179,7 @@ Template.simulationResolution.events({
     } else {
       values = default_resolution[evt.target.value];
 
-      Schemes.update({_id: FlowRouter.getParam('schemeId')},
+      Schemes.update({_id: FlowRouter.getParam('id')},
         {$set : {
           "system.convergence_chunk_size" : values.convergence_chunk_size,
           "system.convergence_tolerance"  : values.convergence_tolerance,
@@ -166,7 +194,7 @@ Template.cross.events({
 
  "click button.delete-cross" : function (evt, inst) {
 
-    var old = Schemes.findOne({_id: FlowRouter.getParam('schemeId')});
+    var old = Schemes.findOne({_id: FlowRouter.getParam('id')});
     var oldName = this.cross.name;// old.crosses[inst.data.ci].name;
 
     //TODO remove cross from charts.
@@ -180,19 +208,19 @@ Template.cross.events({
 
     old.crosses.splice(this.ci, 1);
 
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
      {$set : {crosses:  old.crosses}});
 
   },
   "change select.zygosity" : function (evt, inst) {
     var toSet = {};
     toSet["crosses."+inst.data.ci + ".zygosity"] = evt.target.value;
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
      {$set : toSet });
 
   },
   "change select.add-loci" : function (evt, inst) {
-    var schemeId = FlowRouter.getParam('schemeId');
+    var schemeId = FlowRouter.getParam('id');
     var toSet = { };
 
     if(evt.target.value == "add-all-ZTU2YTdkODc4Njk0NDk0NGNhNzc5ZjFi") {
@@ -221,7 +249,7 @@ Template.cross.events({
   },
   "change input.cross-name": function (evt, inst) {
 
-    var old = Schemes.findOne({_id: FlowRouter.getParam('schemeId')});
+    var old = Schemes.findOne({_id: FlowRouter.getParam('id')});
     var oldName = old.crosses[inst.data.ci].name;
     var newName = evt.target.value;
 
@@ -236,7 +264,7 @@ Template.cross.events({
     });
     old.crosses[inst.data.ci].name = newName;
 
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
      {$set : {crosses:  old.crosses}});
 
   },
@@ -244,21 +272,21 @@ Template.cross.events({
   {
     var toSet = {};
     toSet["crosses."+inst.data.ci + ".left"] = evt.target.value;
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
      {$set : toSet });
   },
   "change select.rparent": (evt, inst) =>
   {
     var toSet = {};
     toSet["crosses."+inst.data.ci + ".right"] = evt.target.value;
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
      {$set : toSet });
   }
 });
 
 Template.cross.helpers({
   optionsPlantsForSelect: function () {
-    var scheme = Schemes.findOne({_id: FlowRouter.getParam('schemeId')});
+    var scheme = Schemes.findOne({_id: FlowRouter.getParam('id')});
     return _.map(scheme.plants, (plant) => { return plant.name});
 
   },
@@ -267,7 +295,7 @@ Template.cross.helpers({
       return;
     }
 
-    var scheme = Schemes.findOne({_id: FlowRouter.getParam('schemeId')});
+    var scheme = Schemes.findOne({_id: FlowRouter.getParam('id')});
     var toRet = _.map(scheme.crosses, (c) => { return c.name});
 
     if(Template.instance().subscriptionsReady())
@@ -300,9 +328,9 @@ Template.plant.events({
 
     toDel = {};
     toDel["plants."+inst.data.pi] = "";
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
       {$unset: toDel});
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
       {$pull: {"plants" : null }});
 
   },
@@ -313,11 +341,11 @@ Template.plant.events({
         "type" : "Marker",
         "location" : null,
         "linkage_group" : null};
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
       {$push : toAdd});
   },
   "change input.parent-name" : (evt, inst) => {
-    var old = Schemes.findOne({_id: FlowRouter.getParam('schemeId')});
+    var old = Schemes.findOne({_id: FlowRouter.getParam('id')});
     var oldName = old.plants[inst.data.pi].name;
     var newName = evt.target.value;
 
@@ -331,12 +359,12 @@ Template.plant.events({
         cross.right = newName;
     });
 
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
      {$set : {crosses:  old.crosses}});
 
     var toSet = {};
     toSet["plants."+inst.data.pi + ".name"] = evt.target.value;
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
       {$set : toSet});
     //TODO Update the lists of plants in crosses & Charts
 
@@ -348,18 +376,18 @@ Template.loci.events({
     toDel = {};
 
     toDel["plants."+inst.data.pi + ".loci."+inst.data.li] = "";
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
       {$unset: toDel});
 
     toDel = {};
     toDel["plants."+inst.data.pi + ".loci"] = null;
 
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
       {$pull: toDel});
 
   },
   "change input.loci-name" : (evt, inst) => {
-    var old = Schemes.findOne({_id: FlowRouter.getParam('schemeId')});
+    var old = Schemes.findOne({_id: FlowRouter.getParam('id')});
     var oldName = old.plants[inst.data.pi].loci[inst.data.li].name;
     var newName = evt.target.value;
 
@@ -372,13 +400,13 @@ Template.loci.events({
         cross.loci[i] = newName;
     });
 
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
      {$set : {crosses:  old.crosses}});
 
     var toSet = {};
     toSet["plants."+inst.data.pi + ".loci."+inst.data.li +
       ".name"] = evt.target.value;
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
       {$set : toSet});
     //TODO Update the lists of Loci in crosses & Charts
   },
@@ -387,7 +415,7 @@ Template.loci.events({
     toSet["plants."+inst.data.pi + ".loci."+inst.data.li +
       '.type'] = evt.target.value;
 
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
      {$set : toSet });
 
   },
@@ -395,7 +423,7 @@ Template.loci.events({
     var toSet = { };
     toSet["plants."+inst.data.pi + ".loci."+inst.data.li +
       '.linkage_group'] = evt.target.value;
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
      {$set : toSet });
 
   },
@@ -403,7 +431,7 @@ Template.loci.events({
     var toSet = { };
     toSet["plants."+inst.data.pi + ".loci."+inst.data.li +
       '.position'] = evt.target.value;
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
      {$set : toSet });
 
   }
@@ -413,7 +441,7 @@ Template.loci.events({
 
 Template.loci.helpers({
   "linkageGroupMax" : function () {
-    var schemeId = FlowRouter.getParam('schemeId');
+    var schemeId = FlowRouter.getParam('id');
     var scheme = Schemes.findOne({_id: schemeId}) || false;
 
     if(scheme)
@@ -422,7 +450,7 @@ Template.loci.helpers({
       return "?";
   },
   "positionMax" : function (group) {
-    var schemeId = FlowRouter.getParam('schemeId');
+    var schemeId = FlowRouter.getParam('id');
     var scheme = Schemes.findOne({_id: schemeId}) || false;
 
     if(scheme && group)
@@ -437,10 +465,10 @@ Template.loci.helpers({
 Template.crossLoci.events({
   "click button.delete-loci" : function (evt, inst) {
 
-    var schemeId = FlowRouter.getParam('schemeId');
+    var schemeId = FlowRouter.getParam('id');
     var toSet = { };
     toSet["crosses."+this.ci + ".loci"] = this.loci;
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
       {$pull: toSet});
 
 
@@ -456,23 +484,23 @@ Template.chart.events({
     toSet = {};
     toSet["outputs."+ this.chi + ".type"] = evt.target.value;
 
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
      {$set : toSet});
 
   },
   "change input.chart-custom" : function (evt, inst) {
     toSet = {};
     toSet["outputs."+ this.chi + ".data"] = evt.target.value;
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
      {$set : toSet});
   },
  "click button.chart-delete" : function (evt, inst) {
 
     toDel = {};
     toDel["outputs."+inst.data.chi] = "";
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
       {$unset: toDel});
-    Schemes.update({_id: FlowRouter.getParam('schemeId')},
+    Schemes.update({_id: FlowRouter.getParam('id')},
       {$pull: {"outputs" : null }});
 
   },

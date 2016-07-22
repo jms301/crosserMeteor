@@ -1,3 +1,17 @@
+<template name="schemes">
+
+<h1>List of your schemes:</h1>
+<ul>
+{{#each s in schemeList}}
+  <li>
+    <A href="{{flowPath 'scheme' s._id}}">{{s.name}}</A>  ver: {{s.version}}
+
+  </li>
+{{/each}}
+</ul>
+</template>
+
+
 <template name="simulationResolution">
 
     <h3>Simulation Resolution:</h3>
@@ -236,9 +250,9 @@
   <br/>
   <br/>
 
-  <button class="btn btn-primary">Save</button>
-  <button class="btn btn-primary">Revert</button>
-  <button class="btn btn-primary" id="process">Save & Process</button>
+  <button class="btn btn-primary" id="backup">Backup</button>
+  <button class="btn btn-primary" id="revert">Revert</button>
+  <button class="btn btn-primary" id="process">Backup & Process</button>
 
   <br/>
   <br/>

@@ -5,14 +5,14 @@ FlowRouter.route('/', {
   }
 });
 
-FlowRouter.route('/scheme/:schemeId', {
+FlowRouter.route('/scheme/:id', {
   name: 'scheme',
   action: function() {
     BlazeLayout.render("mainLayout", {content: "scheme"});
   }
 });
 
-FlowRouter.route('/calculation/:calcId', {
+FlowRouter.route('/calculation/:id', {
   name: 'calculation',
   action: function() {
     BlazeLayout.render("mainLayout", {content: "calculation"});
@@ -22,7 +22,7 @@ FlowRouter.route('/calculation/:calcId', {
 FlowRouter.route('/schemes', {
   name: 'schemes',
   action: function() {
-    BlazeLayout.render("mainLayout", {content: "scheme"});
+    BlazeLayout.render("mainLayout", {content: "schemes"});
   }
 });
 
