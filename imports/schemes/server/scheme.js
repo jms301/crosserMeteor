@@ -81,11 +81,72 @@ function processScheme(task, callback) {
 
 var queue = async.queue(processScheme, 1);
 
+function backupScheme(scheme) {
+  var lastBackup = SchemeHistory.findOne(
+                   {_schemeId: scheme._id, version: scheme.version-1});
+  //TODO diff old version and current version.
+  scheme.schemeId = scheme._id;
+  delete scheme._id;
+  var historyId = SchemeHistory.insert(scheme);
+
+  if(historyId)
+    Schemes.update({_id: scheme.schemeId}, {$inc: {version: 1}});
+
+  return historyId;
+}
+
+
 Meteor.methods({
   'processScheme' : function (schemeId) {
-    queue.push({name: "TestScheme", _id: schemeId}, (err) => {
-      //TODO deal with errors more gracefully.
-      console.log(err)});
+    var scheme = Schemes.findOne({_id: schemeId});
+    if(scheme) {
+      if(this.userId && this.userId == scheme.user_id) {
+        console.log("Processing scheme: " + scheme.name);
+        var histId = backupScheme(scheme);
 
+        var calcId = Calculations.insert( {
+          userId: this.userId,
+          schemeId:  schemeId,
+          historyId: histId,
+          queueTime: new Date(),
+          startTime: null,
+          endTime: null,
+          console: "",
+          errors: "",
+          cross_result: null,
+          r_result: null
+        });
+
+        queue.push({name: scheme.name, _id: histId, calcId: calcId}, (err) => {
+          //TODO deal with errors more gracefully.
+          console.log(err)});
+
+        return ;
+      } else {
+        console.log("Attempted backup with wrong user.")
+        throw new Meteor.Error(401, "User not authorized");
+      }
+    } else {
+      console.log("Failed to find backup for scheme.");
+      throw new Meteor.Error(404, "No such scheme.");
+    }
+  },
+
+  'backupScheme' : function (schemeId) {
+    var scheme = Schemes.findOne({_id: schemeId});
+    if(scheme) {
+      if(this.userId && this.userId == scheme.user_id) {
+        if(backupScheme(scheme))
+          console.log("Backed up: " +  schemeId +
+                      " ver: " + (scheme.version+1));
+
+      } else {
+        console.log("Attempted backup with wrong user.")
+        throw new Meteor.Error(401, "User not authorized");
+      }
+    } else {
+      console.log("Failed to find backup for scheme.");
+      throw new Meteor.Error(404, "No such scheme.");
+    }
   }
 });

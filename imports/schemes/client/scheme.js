@@ -156,6 +156,8 @@ Template.scheme.events({
   //backup, revert & process
 
   "click button#backup": function (evt, inst) {
+    //TODO confirm
+
     Meteor.call('backupScheme', FlowRouter.getParam('id'));
 
   },

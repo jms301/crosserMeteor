@@ -4,7 +4,7 @@ import '../imports/startup/collections.js';
 import '../imports/api/server/scheme_api.js';
 
 //Setup the QUEUE and create the process_scheme meteor method.
-import '../imports/schemes/server/process_scheme.js';
+import '../imports/schemes/server/scheme.js';
 
 //Setup the app
 import '../imports/startup/server/index.js';
