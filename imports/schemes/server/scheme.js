@@ -3,6 +3,8 @@ import async from 'async';
 import fs from 'file-system';
 import child_process from 'child_process';
 
+import create_calc from '../../calculations/server/calc_lib.js'
+
 var spawn = child_process.spawn;
 
 var cr_dir = Meteor.settings.CROSS_DIR;
@@ -100,22 +102,11 @@ Meteor.methods({
   'processScheme' : function (schemeId) {
     var scheme = Schemes.findOne({_id: schemeId});
     if(scheme) {
-      if(this.userId && this.userId == scheme.user_id) {
+      if(this.userId && this.userId == scheme.userId) {
         console.log("Processing scheme: " + scheme.name);
         var histId = backupScheme(scheme);
 
-        var calcId = Calculations.insert( {
-          userId: this.userId,
-          schemeId:  schemeId,
-          historyId: histId,
-          queueTime: new Date(),
-          startTime: null,
-          endTime: null,
-          console: "",
-          errors: "",
-          cross_result: null,
-          r_result: null
-        });
+        var calcId = create_calc(schemeId, histId, this.userId);
 
         queue.push({name: scheme.name, _id: histId, calcId: calcId}, (err) => {
           //TODO deal with errors more gracefully.
@@ -135,7 +126,7 @@ Meteor.methods({
   'backupScheme' : function (schemeId) {
     var scheme = Schemes.findOne({_id: schemeId});
     if(scheme) {
-      if(this.userId && this.userId == scheme.user_id) {
+      if(this.userId && this.userId == scheme.userId) {
         if(backupScheme(scheme))
           console.log("Backed up: " +  schemeId +
                       " ver: " + (scheme.version+1));

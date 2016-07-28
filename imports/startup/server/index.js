@@ -11,11 +11,20 @@ Meteor.startup(() => {
 
 });
 
-Meteor.publish('scheme', function (id) {
-    return Schemes.find({_id: id, user_id: this.userId});
+Meteor.publish('calculation', function (id) {
+    return Calculations.find({_id: id, userd: this.userId});
 });
 
-Meteor.publish('schemes', function (id) {
+Meteor.publish('calculations', function () {
     //TODO limit fields for this publication
-    return Schemes.find({user_id: this.userId});
+    return Calculations.find({userId: this.userId});
+});
+
+Meteor.publish('scheme', function (id) {
+    return Schemes.find({_id: id, userId: this.userId});
+});
+
+Meteor.publish('schemes', function () {
+    //TODO limit fields for this publication
+    return Schemes.find({userId: this.userId});
 });
