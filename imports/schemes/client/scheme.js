@@ -40,6 +40,27 @@ Template.schemes.helpers({
     }
 });
 
+Template.schemes.events({
+  "click button#create-scheme" : function (evt,inst) {
+    //TODO run this on server.
+    Schemes.insert({
+      userId : Meteor.userId(),
+      version : 1,
+      system : {
+        convergence_chunk_size : 1000,
+        convergence_fewest_plants : 10,
+        convergence_tolerance : 0.5
+      },
+      plants : [],
+      crosses : [],
+      outputs : []
+    });
+  }
+
+
+
+});
+
 Template.scheme.onCreated(function () {
   var self = this;
   self.autorun(function () {
@@ -108,6 +129,10 @@ Template.scheme.events({
 
     //TODO refresh loci settings
 
+  },
+  "change input#scheme-name" : (evt, inst) => {
+    Schemes.update({_id: FlowRouter.getParam('id')},
+     {$set : {name : evt.target.value }});
   },
   "change input#chunk-size" : (evt, inst) => {
     var toSet = {};

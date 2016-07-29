@@ -4,11 +4,12 @@
 <ul>
 {{#each s in schemeList}}
   <li>
-    <A href="{{flowPath 'scheme' s._id}}">{{s.name}}</A>  ver: {{s.version}}
+    <A href="{{flowPath 'scheme' s._id}}">{{s.name}} ver: </A> {{s.version}}
 
   </li>
 {{/each}}
 </ul>
+<button id="create-scheme">New Scheme</button>
 </template>
 
 
@@ -175,7 +176,7 @@
 {{#if Template.subscriptionsReady}}
 <div class="row">
 <div class="col-md-12">
-  <h1>Edit Scheme: {{scheme.name}}</h1>
+  <h1>Edit Scheme: <input id="scheme-name" value="{{scheme.name}}"/></h1>
 
   <div class="teal-title">
     <h1 class="teal-title">Config</h1>

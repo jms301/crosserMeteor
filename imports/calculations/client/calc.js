@@ -17,7 +17,6 @@ Template.calculations.helpers({
 
   calcList  : function () {
     console.log(Calculations.find().count());
-    return Calculations.find({}, {$sort: {userId: 0, scheme_id: 1, start  }});
-
+    return Calculations.find({}, {$sort: {userId: 0, schemeId: 1}});
   }
 });

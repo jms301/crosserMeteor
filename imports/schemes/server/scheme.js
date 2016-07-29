@@ -2,8 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import async from 'async';
 import fs from 'file-system';
 import child_process from 'child_process';
-
-import create_calc from '../../calculations/server/calc_lib.js'
+import {create_calc} from '../../calculations/server/calc_lib.js'
 
 var spawn = child_process.spawn;
 
@@ -42,7 +41,9 @@ function processScheme(task, callback) {
         console.log("" + data);
         stdOut = stdOut + data;
       });
+
       task.child.stderr.on('data', (data) => {
+        console.log("" + data);
         stdErr = stdErr + data;
       });
 
