@@ -6,7 +6,7 @@ Template.calculations.onCreated(function () {
   self.autorun(function () {
     self.subscribe('calculations');
     if(self.subscriptionsReady()) {
-      console.log("Calculation subs ready");
+      console.log("Calculation subs ready:");
       console.log(Calculations.find().count());
     }
   });

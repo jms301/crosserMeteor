@@ -24,63 +24,79 @@ if (typeof(r_exe) == 'undefined')
 if (typeof(cr_exe_dir) == 'undefined')
   throw "Missing CROSS_EXE_DIR setting in settings.json";
 
-function processScheme(task, callback) {
+var processScheme = Meteor.bindEnvironment(function (task, callback) {
+
+  console.log("ran processScheme in bound");
+  //set the calc record start time.
+
+  Calculations.update({_id: task.calcId}, {$set : { startTime : new Date()}});
   outputdir = cr_dir + task._id + "/";
 
-  fs.mkdir(outputdir, mask, (err) => {
-    if (!err || err.code == 'EEXIST') {
+  task.child = spawn(cr_exe , ['-o' + outputdir, '-u http://127.0.0.1:3000/api/' + task._id], {"cwd": cr_exe_dir});
 
-      task.child = spawn(cr_exe , ['-o' + outputdir, '-u http://127.0.0.1:3000/api/' + task._id], {"cwd": cr_exe_dir});
+  console.log("#### API URL: http://127.0.0.1:3000/api/" + task._id);
 
-      console.log("#### API URL: http://127.0.0.1:3000/api/" + task._id);
+  var stdOut = "";
+  var stdErr = "";
 
-      var stdOut = "";
-      var stdErr = "";
+  task.child.stdout.on('data', Meteor.bindEnvironment(function (data) {
+    console.log("" + data);
+    stdOut = stdOut + data;
+    Calculations.update({_id: task.calcId},
+      {$set : { crossStdOut : stdOut }});
+  }, (e) => { callback (e)}));
 
-      task.child.stdout.on('data', (data) => {
+  task.child.stderr.on('data', Meteor.bindEnvironment(function (data) {
+    console.log("" + data);
+    stdErr = stdErr + data;
+    Calculations.update({_id: task.calcId},
+      {$set : { crossStdErr : stdErr }});
+  }, (e) => { callback (e)}));
+
+  task.child.on('close', Meteor.bindEnvironment(function (code) {
+    Calculations.update({_id: task.calcId},
+      {$set : { crossExit : code }});
+
+    if (code != 0) {
+      callback(new Error("Crosser exited with: " + code));
+      return;
+    } else {
+      stdOut = "";
+      stdErr = "";
+      task.child = spawn(r_exe , [outputdir], {"cwd": cr_exe_dir});
+
+      task.child.stdout.on('data', Meteor.bindEnvironment(function (data) {
         console.log("" + data);
         stdOut = stdOut + data;
-      });
+        Calculations.update({_id: task.calcId},
+          {$set : { rStdOut : stdOut }});
+      }, (e) => { callback (e)}));
 
-      task.child.stderr.on('data', (data) => {
+      task.child.stderr.on('data', Meteor.bindEnvironment(function (data) {
         console.log("" + data);
         stdErr = stdErr + data;
-      });
+        Calculations.update({_id: task.calcId},
+          {$set : { rStdErr : stdErr }});
+      }, (e) => { callback (e)}));
 
-      task.child.on('close', (code) => {
-          console.log("Crosser closed with: " + code);
-        if (code !== 0) {
-         //error!
+
+      task.child.on('close', Meteor.bindEnvironment(function (code) {
+        Calculations.update({_id: task.calcId},
+          {$set : { rExit : code }});
+        if(code == 0) {
+          //SUCCESS!
+
+          Calculations.update({_id: task.calcId},
+            {$set : { endTime : new Date()}});
+          console.log("completed calculation: " + task.calcId);
+          callback ();
         } else {
-          // everything OK with cross, run R;
-          task.child = spawn(r_exe , [outputdir], {"cwd": cr_exe_dir});
-
-          task.child.stdout.on('data', (data) => {
-            console.log("" + data);
-            stdOut = stdOut + data;
-          });
-          task.child.stderr.on('data', (data) => {
-            console.log("" + data);
-            stdErr = stdErr + data;
-          });
-
-          task.child.on('close', (code) => {
-            console.log("R Scrip closed with: " + code);
-          });
-
-
+          callback(new Error("R exited with: " + code));
         }
-      });
-    } else {
-
+      }, (e) => { callback (e)}));
     }
-  });
-
-
-  setTimeout(function() {
-    callback(null);
-  }, 2000);
-}
+  }, (e) => { callback (e)}));
+}, (e) => { callback(e); });
 
 var queue = async.queue(processScheme, 1);
 
@@ -111,7 +127,7 @@ Meteor.methods({
 
         queue.push({name: scheme.name, _id: histId, calcId: calcId}, (err) => {
           //TODO deal with errors more gracefully.
-          console.log(err)});
+          console.log("Error: " + err)});
 
         return ;
       } else {
