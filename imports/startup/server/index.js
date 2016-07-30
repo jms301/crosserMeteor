@@ -12,7 +12,7 @@ Meteor.startup(() => {
 });
 
 Meteor.publish('calculation', function (id) {
-    return Calculations.find({_id: id, userd: this.userId});
+    return Calculations.find({_id: id, userId: this.userId});
 });
 
 Meteor.publish('calculations', function () {

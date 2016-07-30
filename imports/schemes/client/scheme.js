@@ -27,7 +27,6 @@ Template.schemes.onCreated(function () {
   var self = this;
   self.autorun(function () {
     self.subscribe('schemes');
-      console.log(Schemes.find().count());
     /*if(self.subscriptionsReady()) {
     }*/
   });
@@ -78,8 +77,7 @@ Template.scheme.onCreated(function () {
 Template.scheme.helpers({
   scheme: () => {
     var schemeId = FlowRouter.getParam('id');
-    var scheme = Schemes.findOne({_id: schemeId}) || {};
-    return scheme;
+    return Schemes.findOne({_id: schemeId}) || {};
   },
   speciesList: () => {
     return _.map(default_species , (val, key, list) => {
@@ -193,7 +191,16 @@ Template.scheme.events({
 
   },
   "click button#process" : function (evt, inst) {
-    Meteor.call('processScheme', FlowRouter.getParam('id'));
+    Meteor.call('processScheme', FlowRouter.getParam('id'),
+      (err, calcId)  => {
+        FlowRouter.go("calculation", {id: calcId});
+        //console.log(calcId);
+
+      }
+
+    );
+
+    //TODO Display modal loading dialog!
 
   }
 });

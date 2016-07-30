@@ -5,10 +5,6 @@ Template.calculations.onCreated(function () {
   var self = this;
   self.autorun(function () {
     self.subscribe('calculations');
-    if(self.subscriptionsReady()) {
-      console.log("Calculation subs ready:");
-      console.log(Calculations.find().count());
-    }
   });
 });
 
@@ -16,7 +12,22 @@ Template.calculations.onCreated(function () {
 Template.calculations.helpers({
 
   calcList  : function () {
-    console.log(Calculations.find().count());
     return Calculations.find({}, {$sort: {userId: 0, schemeId: 1}});
   }
+});
+
+Template.calculation.onCreated(function () {
+  var self = this;
+  self.autorun(function () {
+    self.subscribe('calculation', FlowRouter.getParam('id'));
+  });
+});
+
+
+Template.calculation.helpers({
+  'getCalc' :  function () {
+    var calcId = FlowRouter.getParam('id');
+    return (Calculations.findOne({_id: calcId}) || {});
+  },
+
 });

@@ -26,7 +26,6 @@ if (typeof(cr_exe_dir) == 'undefined')
 
 var processScheme = Meteor.bindEnvironment(function (task, callback) {
 
-  console.log("ran processScheme in bound");
   //set the calc record start time.
 
   Calculations.update({_id: task.calcId}, {$set : { startTime : new Date()}});
@@ -34,20 +33,16 @@ var processScheme = Meteor.bindEnvironment(function (task, callback) {
 
   task.child = spawn(cr_exe , ['-o' + outputdir, '-u http://127.0.0.1:3000/api/' + task._id], {"cwd": cr_exe_dir});
 
-  console.log("#### API URL: http://127.0.0.1:3000/api/" + task._id);
-
   var stdOut = "";
   var stdErr = "";
 
   task.child.stdout.on('data', Meteor.bindEnvironment(function (data) {
-    console.log("" + data);
     stdOut = stdOut + data;
     Calculations.update({_id: task.calcId},
       {$set : { crossStdOut : stdOut }});
   }, (e) => { callback (e)}));
 
   task.child.stderr.on('data', Meteor.bindEnvironment(function (data) {
-    console.log("" + data);
     stdErr = stdErr + data;
     Calculations.update({_id: task.calcId},
       {$set : { crossStdErr : stdErr }});
@@ -66,14 +61,13 @@ var processScheme = Meteor.bindEnvironment(function (task, callback) {
       task.child = spawn(r_exe , [outputdir], {"cwd": cr_exe_dir});
 
       task.child.stdout.on('data', Meteor.bindEnvironment(function (data) {
-        console.log("" + data);
+        data = (data + "")
         stdOut = stdOut + data;
         Calculations.update({_id: task.calcId},
           {$set : { rStdOut : stdOut }});
       }, (e) => { callback (e)}));
 
       task.child.stderr.on('data', Meteor.bindEnvironment(function (data) {
-        console.log("" + data);
         stdErr = stdErr + data;
         Calculations.update({_id: task.calcId},
           {$set : { rStdErr : stdErr }});
@@ -123,13 +117,17 @@ Meteor.methods({
         console.log("Processing scheme: " + scheme.name);
         var histId = backupScheme(scheme);
 
-        var calcId = create_calc(schemeId, histId, this.userId);
+        var calcId = create_calc(scheme.name + " - v:" + scheme.version, schemeId, histId, this.userId);
 
-        queue.push({name: scheme.name, _id: histId, calcId: calcId}, (err) => {
+        queue.push({name: scheme.name + " - v: " + scheme.version, _id: histId, calcId: calcId}, (err) => {
           //TODO deal with errors more gracefully.
-          console.log("Error: " + err)});
+          if(err) {
+            console.log("Cross processing failed with error!");
+            console.log("Error: " + err);
+            throw e;
+          }
 
-        return ;
+        });
       } else {
         console.log("Attempted backup with wrong user.")
         throw new Meteor.Error(401, "User not authorized");
@@ -138,6 +136,8 @@ Meteor.methods({
       console.log("Failed to find backup for scheme.");
       throw new Meteor.Error(404, "No such scheme.");
     }
+
+    return calcId;
   },
 
   'backupScheme' : function (schemeId) {

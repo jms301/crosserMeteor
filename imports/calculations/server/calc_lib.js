@@ -1,6 +1,7 @@
-export function create_calc(schemeId, histId, userId) {
+export function create_calc(name, schemeId, histId, userId) {
 
 	return Calculations.insert( {
+    name: name,
 		schemeId:  schemeId,
 		historyId: histId,
 		userId: userId,

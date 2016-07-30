@@ -5,15 +5,50 @@
 
 <ul>
 {{#each calc in calcList}}
-  <li> {{calc.name}} </li>
+  <li>
+    <A href="{{flowPath 'calculation' calc._id}}">{{calc.name}}</A>
+  </li>
+
 {{/each}}
 </ul>
 
 </template>
 
 <template name="calculation">
+{{#if Template.subscriptionsReady}}
+
+{{#let calc = getCalc}}
+
 <h1>
-  Calculation
+  Calculation: {{calc.name}}
 </h1>
 
+  <b>status:</b> {{status}}
+  <br/>
+  <br/>
+
+  <b>StdOut</b>
+  <pre>
+  <b>Crosser:</b>
+  <br/>
+  {{calc.crossStdOut}}
+  <br/>
+  <b>R:</b>
+  <br/>
+  {{calc.rStdOut}}
+  </pre>
+
+  <b>StdErr</b>
+  <pre>
+  <b>Crosser:</b>
+  <br/>
+  {{calc.crossStdErr}}
+  <br/>
+  <b>R:</b>
+  <br/>
+  {{calc.rStdErr}}
+  </pre>
+
+{{/let}}
+{{/if}}
 </template>
