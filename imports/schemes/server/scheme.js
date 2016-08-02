@@ -29,9 +29,9 @@ var processScheme = Meteor.bindEnvironment(function (task, callback) {
   //set the calc record start time.
 
   Calculations.update({_id: task.calcId}, {$set : { startTime : new Date()}});
-  outputdir = cr_dir + task._id + "/";
+  outputdir = cr_dir + task.calcId + "/";
 
-  task.child = spawn(cr_exe , ['-o' + outputdir, '-u http://127.0.0.1:3000/api/' + task._id], {"cwd": cr_exe_dir});
+  task.child = spawn(cr_exe , ['-o' + outputdir, '-u http://127.0.0.1:3000/api/' + task.histId], {"cwd": cr_exe_dir});
 
   var stdOut = "";
   var stdErr = "";
@@ -119,7 +119,7 @@ Meteor.methods({
 
         var calcId = create_calc(scheme.name + " - v:" + scheme.version, schemeId, histId, this.userId);
 
-        queue.push({name: scheme.name + " - v: " + scheme.version, _id: histId, calcId: calcId}, (err) => {
+        queue.push({name: scheme.name + " - v: " + scheme.version, histId: histId, calcId: calcId}, (err) => {
           //TODO deal with errors more gracefully.
           if(err) {
             console.log("Cross processing failed with error!");

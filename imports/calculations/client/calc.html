@@ -1,3 +1,17 @@
+<template name="results">
+  <h2> Results </h2>
+  pdf: <a href="{{pdfUrl calc}}">plot.pdf</a><br/>
+  csvs: <a href="{{resultsUrl calc}}">Results Directory</a><br/>
+  Logs: <a href="{{logUrl calc}}">Logs</a><br/>
+  <br/>
+
+  Queued at:  {{calc.queueTime}}<br/>
+  Started:  {{calc.startTime}}<br/>
+  Finished:  {{calc.endTime}}<br/>
+  <br/>
+  Duration: {{duration calc}}
+</template>
+
 <template name="calculations">
 <h1>
   Calculation List
@@ -19,34 +33,35 @@
 
 {{#let calc = getCalc}}
 
+
 <h1>
-  Calculation: {{calc.name}}
+  Calculation: <a href="{{flowPath 'scheme' calc.schemeId }}">{{calc.name}}</a>
+  - <b>{{status calc}}</b>
 </h1>
 
-  <b>status:</b> {{status}}
+  {{#if calc.endTime}}
+    {{> results calc = calc}}
+  {{/if}}
+
   <br/>
   <br/>
 
   <b>StdOut</b>
   <pre>
   <b>Crosser:</b>
-  <br/>
-  {{calc.crossStdOut}}
+  <br/>{{calc.crossStdOut}}
   <br/>
   <b>R:</b>
-  <br/>
-  {{calc.rStdOut}}
+  <br/>{{calc.rStdOut}}
   </pre>
 
   <b>StdErr</b>
   <pre>
   <b>Crosser:</b>
-  <br/>
-  {{calc.crossStdErr}}
+  <br/>{{calc.crossStdErr}}
   <br/>
   <b>R:</b>
-  <br/>
-  {{calc.rStdErr}}
+  <br/>{{calc.rStdErr}}
   </pre>
 
 {{/let}}
