@@ -5,6 +5,8 @@ import 'bootstrap/dist/js/bootstrap.min.js';
 import {default_resolution} from './default.js';
 import {default_species} from './default.js';
 import {CrossTree} from './crosstree.js';
+import { EJSON } from 'meteor/ejson';
+
 
 var CTree = {};
 
@@ -497,6 +499,18 @@ Template.crossLoci.events({
 
 });
 
+Template.chart.helpers({
+  "custom_type" : function (type ) {
+    known_types = ["mean_cross_composition", "proportion_distribution",
+     "loci_composition", "success_table"];
+    return _.contains(known_types, type);
+  },
+  "parsed_data" : function () {
+    console.log( EJSON.parse(this.chart.data));
+    return EJSON.parse(this.chart.data);
+
+  }
+});
 
 Template.chart.events({
   "change select.chart-type" : function (evt, inst) {
@@ -527,3 +541,5 @@ Template.chart.events({
 
 
 });
+
+

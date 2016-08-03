@@ -165,11 +165,53 @@
       {{isSelected chart.type "custom"}}>Custom</option>
     </select>
 
-    <input value="{{chart.data}}" class="chart-custom" />
+    {{#if $eq chart.type "loci_composition"}}
+      <input value="{{chart.data}}" class="chart-custom" />
+    {{/if}}
+
+    {{#if $eq chart.type "success_table"}}
+      <input value="{{chart.data}}" class="chart-custom" />
+    {{/if}}
+
+    {{#if $eq chart.type "proportion_distribution"}}
+      <input value="{{chart.data}}" class="chart-custom" />
+    {{/if}}
+
+    {{#if $eq chart.type "mean_cross_composition"}}
+      {{> meanCrossComposition data = parsed_data chi=chi chart=chart}}
+    {{/if}}
+
+    {{#unless custom_type chart.type}}
+      <input value="{{chart.type}}" class="chart-type-custom" />
+      <input value="{{chart.data}}" class="chart-data-custom" />
+    {{/unless}}
 
     <button class="chart-delete">X</button>
   </div>
+
+
+
 </template>
+
+<template name="lociComposition">
+</template>
+
+<template name="successTable">
+{{data}}
+</template>
+
+<template name="proportionDistribution">
+{{data}}
+</template>
+
+<template name="meanCrossComposition">
+  <select multiple="">
+  {{#each cross in scheme.crosses}}
+  <option selected="{{isSelectedSet data.crosses cross}}"> {{cross}} </option>
+  {{/each}}
+  </select>
+</template>
+
 
 
 <template name="scheme">
