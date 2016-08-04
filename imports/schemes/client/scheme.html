@@ -166,19 +166,49 @@
     </select>
 
     {{#if $eq chart.type "loci_composition"}}
-      <input value="{{chart.data}}" class="chart-custom" />
+      <select class="loci-composition">
+        <option></option>
+        {{#each cross in all_crosses}}
+          <option {{isSelected parsed_data.cross cross}}>{{cross}}</option>
+        {{/each}}
+      </select>
     {{/if}}
 
     {{#if $eq chart.type "success_table"}}
-      <input value="{{chart.data}}" class="chart-custom" />
+      {{#each stable in parsed_data.require}}
+        {{> successTable data=parsed_data stable=stable chi=chi si=@index}}
+      {{/each}}
+
+      <button class="success-table-add"> + </button>
     {{/if}}
 
     {{#if $eq chart.type "proportion_distribution"}}
-      <input value="{{chart.data}}" class="chart-custom" />
+    Donor:
+
+      <select class="proportion-distribution-donor">
+        <option></option>
+        {{#each donor in all_plants}}
+          <option {{isSelected parsed_data.donor donor}}>{{donor}}</option>
+        {{/each}}
+      </select>
+
+    Cross:
+      <select class="proportion-distribution-cross">
+        <option></option>
+        {{#each cross in all_crosses}}
+          <option {{isSelected parsed_data.cross cross}}>{{cross}}</option>
+        {{/each}}
+      </select>
+
+
     {{/if}}
 
     {{#if $eq chart.type "mean_cross_composition"}}
-      {{> meanCrossComposition data = parsed_data chi=chi chart=chart}}
+      <select multiple="" class="mean-cross-data">
+      {{#each cross in all_crosses}}
+        <option {{isSelectedSet parsed_data.crosses cross}}>{{cross}}</option>
+      {{/each}}
+      </select>
     {{/if}}
 
     {{#unless custom_type chart.type}}
@@ -193,26 +223,19 @@
 
 </template>
 
-<template name="lociComposition">
-</template>
-
 <template name="successTable">
-{{data}}
-</template>
-
-<template name="proportionDistribution">
-{{data}}
-</template>
-
-<template name="meanCrossComposition">
-  <select multiple="">
-  {{#each cross in scheme.crosses}}
-  <option selected="{{isSelectedSet data.crosses cross}}"> {{cross}} </option>
-  {{/each}}
+<div>
+  <select class="stable-cross">
+    <option></option>
+    {{#each cross in all_crosses}}
+      <option {{isSelected stable.cross cross}}>{{cross}}</option>
+    {{/each}}
   </select>
+  <input class="stable-quantity" value="{{stable.quantity}}"/>
+  <input class="stable-confidence" value="{{stable.confidence}}"/>
+  <button class="stable-delete">X</button>
+</div>
 </template>
-
-
 
 <template name="scheme">
 {{#if Template.subscriptionsReady}}

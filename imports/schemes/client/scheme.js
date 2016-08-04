@@ -506,10 +506,19 @@ Template.chart.helpers({
     return _.contains(known_types, type);
   },
   "parsed_data" : function () {
-    console.log( EJSON.parse(this.chart.data));
     return EJSON.parse(this.chart.data);
 
-  }
+  },
+  "all_crosses" : function () {
+    var scheme = Schemes.findOne({_id: FlowRouter.getParam('id')}) || {};
+
+    return _.map(scheme.crosses, (cross) => { return cross.name });
+  },
+  "all_plants" : function () {
+    var scheme = Schemes.findOne({_id: FlowRouter.getParam('id')}) || {};
+
+    return _.map(scheme.plants, (plant) => { return plant.name });
+  },
 });
 
 Template.chart.events({
@@ -538,8 +547,86 @@ Template.chart.events({
       {$pull: {"outputs" : null }});
 
   },
+  "change select.mean-cross-data" : function (evt, inst)  {
+    var data = (inst.$("select.mean-cross-data").val() || []);
+    var toSet = {};
+    toSet["outputs." + this.chi + ".data"] = EJSON.stringify(
+      {crosses : data});
+    Schemes.update({_id: FlowRouter.getParam('id')},
+      {$set: toSet });
+  },
+  "change select.loci-composition" : function (evt, inst)  {
+    var toSet = {};
+    toSet["outputs." + this.chi + ".data"] = EJSON.stringify(
+      {cross : evt.target.value});
+    Schemes.update({_id: FlowRouter.getParam('id')},
+      {$set: toSet });
+  },
+  "change select.proportion-distribution-donor" : function (evt, inst) {
+    var cross = (inst.$("select.proportion-distribution-cross").val());
+    var toSet = {};
+    toSet["outputs." + this.chi + ".data"] = EJSON.stringify(
+      {donor : evt.target.value, cross : cross});
+    Schemes.update({_id: FlowRouter.getParam('id')},
+      {$set: toSet });
+  },
+  "change select.proportion-distribution-cross" : function (evt, inst) {
+    var donor = (inst.$("select.proportion-distribution-donor").val());
+    var toSet = {};
+    toSet["outputs." + this.chi + ".data"] = EJSON.stringify(
+      {cross : evt.target.value, donor : donor});
+    Schemes.update({_id: FlowRouter.getParam('id')},
+      {$set: toSet });
+  },
+  "click button.success-table-add" : function (evt, inst) {
+    this.data = EJSON.parse(this.chart.data);
 
+    this.data.require.push( { cross : "", confidence: 0.95, quantity : 5});
+    var toSet = {};
+    toSet["outputs." + this.chi + ".data"] = EJSON.stringify(this.data);
+    Schemes.update({_id: FlowRouter.getParam('id')},
+      {$set: toSet });
+  },
 
 });
+
+Template.successTable.helpers({
+  "all_crosses" : function () {
+    var scheme = Schemes.findOne({_id: FlowRouter.getParam('id')}) || {};
+    return _.map(scheme.crosses, (cross) => { return cross.name });
+  },
+});
+
+Template.successTable.events({
+  "change select.stable-cross" : function (evt, inst) {
+    this.data.require[this.si].cross = evt.target.value;
+    var toSet = {};
+    toSet["outputs." + this.chi + ".data"] = EJSON.stringify(this.data);
+    Schemes.update({_id: FlowRouter.getParam('id')},
+      {$set: toSet });
+  },
+  "change input.stable-quantity" : function (evt, inst) {
+    this.data.require[this.si].quantity = evt.target.value;
+    var toSet = {};
+    toSet["outputs." + this.chi + ".data"] = EJSON.stringify(this.data);
+    Schemes.update({_id: FlowRouter.getParam('id')},
+      {$set: toSet });
+  },
+  "change input.stable-confidence" : function (evt, inst) {
+    this.data.require[this.si].confidence = evt.target.value;
+    var toSet = {};
+    toSet["outputs." + this.chi + ".data"] = EJSON.stringify(this.data);
+    Schemes.update({_id: FlowRouter.getParam('id')},
+      {$set: toSet });
+  },
+  "click button.stable-delete" : function (evt, inst) {
+    this.data.require.splice(this.si, 1);
+    var toSet = {};
+    toSet["outputs." + this.chi + ".data"] = EJSON.stringify(this.data);
+    Schemes.update({_id: FlowRouter.getParam('id')},
+      {$set: toSet });
+  },
+});
+
 
 
