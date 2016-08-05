@@ -313,17 +313,25 @@ Template.cross.helpers({
 
   },
   optionsCrossesForSelect: function (cross) {
-    if(!cross || !cross.name) {
-      return;
-    }
-
     var scheme = Schemes.findOne({_id: FlowRouter.getParam('id')});
-    var toRet = _.map(scheme.crosses, (c) => { return c.name});
+    var toRet = _.reduce(scheme.crosses, function (arry, obj) {
+      if (obj.name) {
+        arry.push(obj.name);
+      }
+      return arry;
+    }, []);
+
+
+    if(!cross || !cross.name) {
+      //current cross can't be in the tree so it can have parents.
+      return toRet;
+    }
 
     if(Template.instance().subscriptionsReady())
     {
       descFound = CTree.getDescendants(cross);
     }
+
     toRet = _.filter(toRet, (item, index, list)=> {
 
       return !_.contains(descFound, item);
