@@ -91,6 +91,7 @@
   <tr>
     <td><input class="cross-name" value="{{cross.name}}"></td>
     <td><select class="rparent" >
+      <option {{isSelected cross.right null}} disabled>select parent:</option>
       <optgroup label = "Parents">
         {{#each o in optionsPlantsForSelect}}
           <option {{isSelected o cross.right}}>{{o}}</option>
@@ -104,6 +105,7 @@
     </select>
     </td>
     <td><select class="lparent" >
+      <option {{isSelected cross.left null}} disabled>select parent:</option>
       <optgroup label = "Parents">
         {{#each o in optionsPlantsForSelect}}
           <option {{isSelected o cross.left}}>{{o}}</option>
@@ -283,8 +285,8 @@
     {{#if scheme.crosses}}
     <tr>
     <th>Name:</th>
-    <th>L Parent:</th>
-    <th>R Parent:</th>
+    <th><i class="fa fa-mars"></i> Parent:</th>
+    <th><i class="fa fa-venus"></i> Parent:</th>
     <th>Selection Zygosity</th>
     <th>Loci To Select For:</th>
     </tr>

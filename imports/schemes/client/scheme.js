@@ -635,6 +635,3 @@ Template.successTable.events({
       {$set: toSet });
   },
 });
-
-
-
