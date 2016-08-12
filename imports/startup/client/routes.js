@@ -32,3 +32,11 @@ FlowRouter.route('/calculations', {
     BlazeLayout.render("mainLayout", {content: "calculations"});
   }
 });
+
+FlowRouter.route('/admin', {
+  name: 'admin',
+  action: function() {
+    BlazeLayout.render("mainLayout", {content: "admin"});
+  }
+});
+

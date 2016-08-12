@@ -12,3 +12,8 @@ import '../imports/schemes/client/scheme.js';
 
 import '../imports/calculations/client/calc.html';
 import '../imports/calculations/client/calc.js';
+
+//Import admin code
+
+import '../imports/admin/client/admin.html';
+import '../imports/admin/client/admin.js';

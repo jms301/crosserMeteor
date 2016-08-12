@@ -20,6 +20,12 @@ Meteor.publish('calculations', function () {
     return Calculations.find({userId: this.userId});
 });
 
+Meteor.publish('running_calculations', function () {
+    //TODO limit fields for this publication
+    //TODO limit this to runing calculations!
+    return Calculations.find({});
+});
+
 Meteor.publish('scheme', function (id) {
     return Schemes.find({_id: id, userId: this.userId});
 });

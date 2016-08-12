@@ -33,6 +33,7 @@ var processScheme = Meteor.bindEnvironment(function (task, callback) {
 
   task.child = spawn(cr_exe , ['-o' + outputdir, '-u http://127.0.0.1:3000/api/' + task.histId], {"cwd": cr_exe_dir});
 
+  task.status = "Running Crosser";
   var stdOut = "";
   var stdErr = "";
 
@@ -56,6 +57,7 @@ var processScheme = Meteor.bindEnvironment(function (task, callback) {
       callback(new Error("Crosser exited with: " + code));
       return;
     } else {
+      task.status = "R Script";
       stdOut = "";
       stdErr = "";
       task.child = spawn(r_exe , [outputdir], {"cwd": cr_exe_dir});
@@ -92,7 +94,7 @@ var processScheme = Meteor.bindEnvironment(function (task, callback) {
   }, (e) => { callback (e)}));
 }, (e) => { callback(e); });
 
-var queue = async.queue(processScheme, 1);
+export var queue = async.queue(processScheme, 1);
 
 function backupScheme(scheme) {
   var lastBackup = SchemeHistory.findOne(
@@ -119,7 +121,7 @@ Meteor.methods({
 
         var calcId = create_calc(scheme.name + " - v:" + scheme.version, schemeId, histId, this.userId);
 
-        queue.push({name: scheme.name + " - v: " + scheme.version, histId: histId, calcId: calcId}, (err) => {
+        queue.push({name: scheme.name + " - v: " + scheme.version, histId: histId, calcId: calcId, status: "Queued"}, (err) => {
           //TODO deal with errors more gracefully.
           if(err) {
             console.log("Cross processing failed with error!");
