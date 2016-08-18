@@ -6,6 +6,7 @@ Template.admin.onCreated(function () {
   self.autorun(function () {
     self.subscribe('running_calculations');
     self.subscribe('working_tasks');
+    self.subscribe('queued_tasks');
     if(self.subscriptionsReady()) {
 			console.log("subscribed");
     }
@@ -18,6 +19,10 @@ Template.admin.helpers({
 		return WorkingTasks.find();
 
  	},
+
+  queuedTasks: () => {
+    return QueuedTasks.find();
+  },
 
 	getCalc: (id) => {
 		return	Calculations.find({_id: id});

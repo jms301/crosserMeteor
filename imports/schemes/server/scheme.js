@@ -130,6 +130,7 @@ Meteor.methods({
           }
 
         });
+      console.log(queue.tasks);
       } else {
         console.log("Attempted backup with wrong user.")
         throw new Meteor.Error(401, "User not authorized");

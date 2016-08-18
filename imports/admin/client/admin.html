@@ -3,12 +3,17 @@
 
 Running:
 {{#each task in workingTasks}}
+  <h3>{{task.name}}</h3>
   {{task.status}} <br/>
 {{/each}}
 
 <br/>
 Queue:
 
+{{#each task in queuedTasks}}
+  <h3>{{task.name}}</h3>
+  {{task.status}} <br/>
+{{/each}}
 <br/>
 <br/>
 
