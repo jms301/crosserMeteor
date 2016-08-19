@@ -29,3 +29,10 @@ Template.admin.helpers({
 	}
 
 });
+
+
+Template.runningJob.events({
+  "click button.kill-job" : function (evt, inst) {
+    Meteor.call("killJob",  inst.data.task.calcId);
+  }
+});

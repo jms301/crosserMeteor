@@ -1,4 +1,5 @@
 import {queue} from '../../schemes/server/scheme.js';
+import process from 'process';
 
 
 Meteor.publish('queued_tasks', function () {
@@ -19,8 +20,6 @@ Meteor.publish('queued_tasks', function () {
         this.changed("queued_tasks", doc._id, doc);
         published = _.without(published, task.data.histId);
       } else {
-        console.log("Added " + doc._id);
-      // console.log(doc);
         this.added("queued_tasks", doc._id, doc);
       }
 
@@ -30,7 +29,6 @@ Meteor.publish('queued_tasks', function () {
 
     //Remove stale publications
     published.forEach((staleId) => {
-      console.log("removing " + staleId);
       this.removed("queued_tasks", staleId);
     });
 
@@ -69,8 +67,6 @@ Meteor.publish('working_tasks', function () {
         this.changed("working_tasks", doc._id, doc);
         published = _.without(published, task.data.histId);
       } else {
-        console.log("Added " + doc._id);
-      // console.log(doc);
         this.added("working_tasks", doc._id, doc);
       }
 
@@ -80,7 +76,6 @@ Meteor.publish('working_tasks', function () {
 
     //Remove stale publications
     published.forEach((staleId) => {
-      console.log("removing " + staleId);
       this.removed("working_tasks", staleId);
     });
 
@@ -98,10 +93,27 @@ Meteor.publish('working_tasks', function () {
   });
 });
 
-Meteor.setInterval(() => {
-  queue.tasks.forEach((task) => {
-    //console.log(task);
-  });
 
-}, 1000);
 
+Meteor.methods({
+  killJob: function (calcId) {
+    var workers = queue.workersList();
+    workers.forEach((task) => {
+
+      if(calcId == task.data.calcId && task.data.child &&
+         task.data.child.pid) {
+        console.log("killing child process: " + task.data.child.pid);
+        try {
+          process.kill(-task.data.child.pid);
+
+          Calculations.update({_id: task.data.calcId},
+            {$set: {startTime: null, endTime: null, queueTime: null}});
+
+        } catch (e) {
+          //Failed to kill no action necessary
+        }
+
+      }
+    });
+  }
+});

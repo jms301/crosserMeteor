@@ -3,8 +3,7 @@
 
 Running:
 {{#each task in workingTasks}}
-  <h3>{{task.name}}</h3>
-  {{task.status}} <br/>
+  {{> runningJob task=task}}
 {{/each}}
 
 <br/>
@@ -21,4 +20,9 @@ User List:
 
 <br/>
 </template>
+<template name="runningJob">
 
+  <h3>{{task.name}}</h3>
+  {{task.status}} <br/>
+  <button class="kill-job">Terminate Calculation</button>
+</template>

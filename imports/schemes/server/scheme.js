@@ -31,7 +31,7 @@ var processScheme = Meteor.bindEnvironment(function (task, callback) {
   Calculations.update({_id: task.calcId}, {$set : { startTime : new Date()}});
   outputdir = cr_dir + task.calcId + "/";
 
-  task.child = spawn(cr_exe , ['-o' + outputdir, '-u http://127.0.0.1:3000/api/' + task.histId], {"cwd": cr_exe_dir});
+  task.child = spawn(cr_exe , ['-o' + outputdir, '-u http://127.0.0.1:3000/api/' + task.histId], {"cwd": cr_exe_dir, "detached": true});
 
   task.status = "Running Crosser";
   var stdOut = "";
@@ -41,39 +41,39 @@ var processScheme = Meteor.bindEnvironment(function (task, callback) {
     stdOut = stdOut + data;
     Calculations.update({_id: task.calcId},
       {$set : { crossStdOut : stdOut }});
-  }, (e) => { callback (e)}));
+  }, (e) => { callback ()}));
 
   task.child.stderr.on('data', Meteor.bindEnvironment(function (data) {
     stdErr = stdErr + data;
     Calculations.update({_id: task.calcId},
       {$set : { crossStdErr : stdErr }});
-  }, (e) => { callback (e)}));
+  }, (e) => { callback ()}));
 
   task.child.on('close', Meteor.bindEnvironment(function (code) {
     Calculations.update({_id: task.calcId},
       {$set : { crossExit : code }});
 
     if (code != 0) {
-      callback(new Error("Crosser exited with: " + code));
+      throw new Meteor.Error(500, 'Cross exited with: ' + code);
       return;
     } else {
       task.status = "R Script";
       stdOut = "";
       stdErr = "";
-      task.child = spawn(r_exe , [outputdir], {"cwd": cr_exe_dir});
+      task.child = spawn(r_exe , [outputdir], {"cwd": cr_exe_dir, "detached" : true});
 
       task.child.stdout.on('data', Meteor.bindEnvironment(function (data) {
         data = (data + "")
         stdOut = stdOut + data;
         Calculations.update({_id: task.calcId},
           {$set : { rStdOut : stdOut }});
-      }, (e) => { callback (e)}));
+      }, (e) => { callback ()}));
 
       task.child.stderr.on('data', Meteor.bindEnvironment(function (data) {
         stdErr = stdErr + data;
         Calculations.update({_id: task.calcId},
           {$set : { rStdErr : stdErr }});
-      }, (e) => { callback (e)}));
+      }, (e) => { callback ()}));
 
 
       task.child.on('close', Meteor.bindEnvironment(function (code) {
@@ -87,12 +87,26 @@ var processScheme = Meteor.bindEnvironment(function (task, callback) {
           console.log("completed calculation: " + task.calcId);
           callback ();
         } else {
-          callback(new Error("R exited with: " + code));
+          throw new Meteor.Error(500, 'R exited with: ' + code);
         }
-      }, (e) => { callback (e)}));
+      }, (e) => {
+
+        stdErr = stdErr + "\n " + e;
+        Calculations.update({_id: task.calcId},
+          {$set : { rStdErr : stdErr }});
+        callback ();
+      }));
     }
-  }, (e) => { callback (e)}));
-}, (e) => { callback(e); });
+  }, (e) => {
+    stdErr = stdErr + "\n " + e;
+    Calculations.update({_id: task.calcId},
+      {$set : { crossStdErr : stdErr }});
+    callback ();
+  }));
+}, (e) => {
+  console.log("3: "  +  e);
+  callback();
+});
 
 export var queue = async.queue(processScheme, 1);
 
@@ -126,11 +140,10 @@ Meteor.methods({
           if(err) {
             console.log("Cross processing failed with error!");
             console.log("Error: " + err);
-            throw e;
+            throw err;
           }
 
         });
-      console.log(queue.tasks);
       } else {
         console.log("Attempted backup with wrong user.")
         throw new Meteor.Error(401, "User not authorized");

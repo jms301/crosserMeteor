@@ -36,7 +36,7 @@ Template.calculation.helpers({
       return 'Running';
     if ( calc.queueTime )
       return 'Queued';
-    return 'Error! Not Queued!';
+    return 'Terminated or Crashed!';
   }
 
 });
