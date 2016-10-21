@@ -23,17 +23,10 @@ Meteor.publish('calculations', function () {
   return Calculations.find({}, {fields: {name: 1, schemeId: 1}});
 });
 
-Meteor.publish('running_calculations', function () {
-    //TODO limit fields for this publication
-    //TODO limit this to runing calculations!
-    return Calculations.find({});
-});
-
 Meteor.publish('scheme', function (id) {
     return Schemes.find({_id: id, userId: this.userId});
 });
 
 Meteor.publish('schemes', function () {
-    //TODO limit fields for this publication
-    return Schemes.find({userId: this.userId});
+    return Schemes.find({userId: this.userId}, {fields: {name: 1, version: 1}});
 });

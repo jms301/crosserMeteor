@@ -4,7 +4,6 @@ import 'bootstrap/dist/js/bootstrap.min.js';
 Template.admin.onCreated(function () {
   var self = this;
   self.autorun(function () {
-    self.subscribe('running_calculations');
     self.subscribe('working_tasks');
     self.subscribe('queued_tasks');
     if(self.subscriptionsReady()) {
@@ -23,11 +22,6 @@ Template.admin.helpers({
   queuedTasks: () => {
     return QueuedTasks.find();
   },
-
-	getCalc: (id) => {
-		return	Calculations.find({_id: id});
-	}
-
 });
 
 
