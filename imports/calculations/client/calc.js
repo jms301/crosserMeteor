@@ -5,7 +5,7 @@ Template.calculations.onCreated(function () {
   var self = this;
   self.autorun(function () {
     self.subscribe('schemes');
-    self.subscribe('top_calc_list');
+    self.subscribe('calculations');
   });
 });
 
