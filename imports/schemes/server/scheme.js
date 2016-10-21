@@ -130,10 +130,10 @@ Meteor.methods({
     var scheme = Schemes.findOne({_id: schemeId});
     if(scheme) {
       if(this.userId && this.userId == scheme.userId) {
-        console.log("Processing scheme: " + scheme.name);
         var histId = backupScheme(scheme);
-
         var calcId = create_calc(scheme.name + " - v:" + scheme.version, schemeId, histId, this.userId);
+
+        Schemes.update({_id: schemeId}, {$set: {last_calc_id: calcId}});
 
         queue.push({name: scheme.name + " - v: " + scheme.version, histId: histId, calcId: calcId, status: "Queued"}, (err) => {
           //TODO deal with errors more gracefully.

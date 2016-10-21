@@ -4,7 +4,8 @@ import 'bootstrap/dist/js/bootstrap.min.js';
 Template.calculations.onCreated(function () {
   var self = this;
   self.autorun(function () {
-    self.subscribe('calculations');
+    self.subscribe('schemes');
+    self.subscribe('top_calc_list');
   });
 });
 
@@ -12,7 +13,11 @@ Template.calculations.onCreated(function () {
 Template.calculations.helpers({
 
   calcList  : function () {
-    return Calculations.find({}, {$sort: {userId: 0, schemeId: 1}});
+    schemes = Schemes.find();
+    topCalcs = schemes.map ((item) => {
+      return Calculations.findOne({_id: item.last_calc_id});
+    });
+    return topCalcs;
   }
 });
 
