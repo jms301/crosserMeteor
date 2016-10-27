@@ -20,12 +20,34 @@
 <ul>
 {{#each calc in calcList}}
   <li>
-    <A href="{{flowPath 'calculation' calc._id}}">{{calc.name}}</A>
+    {{>calc_list_item calc = calc}}
   </li>
-
 {{/each}}
 </ul>
 
+</template>
+
+<template name="calc_list_item">
+ <A href="{{flowPath 'calculation' calc._id}}">{{calc.name}}</A>
+    {{#if expanded}}
+      <button>-</button>
+    {{else}}
+      <button>+</button>
+    {{/if}}
+    {{#if expanded}}
+      {{>scheme_calc_list schemeId=calc.schemeId}}
+    {{/if}}
+
+</template>
+
+<template name="scheme_calc_list">
+  <ul>
+    {{#each calc in scheme_calcs}}
+    <li>
+      <A href="{{flowPath 'calculation' calc._id}}">{{calc.name}}</A>
+    </li>
+    {{/each}}
+  </ul>
 </template>
 
 <template name="calculation">

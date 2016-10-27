@@ -28,5 +28,5 @@ Meteor.publish('scheme', function (id) {
 });
 
 Meteor.publish('schemes', function () {
-    return Schemes.find({userId: this.userId}, {fields: {name: 1, version: 1}});
+    return Schemes.find({userId: this.userId}, {fields: {name: 1, version: 1, last_calc_id: 1}});
 });

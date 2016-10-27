@@ -1,5 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.min.js';
+import { ReactiveVar } from 'meteor/reactive-var';
 
 Template.calculations.onCreated(function () {
   var self = this;
@@ -20,6 +21,36 @@ Template.calculations.helpers({
     return topCalcs;
   }
 });
+
+Template.calc_list_item.onCreated(function() {
+  this.expanded = new ReactiveVar(false);
+
+});
+
+Template.calc_list_item.helpers({
+  expanded : function () {
+    return Template.instance().expanded.get();
+  }
+});
+
+
+Template.calc_list_item.events({
+  "click button" : function () {
+    Template.instance().expanded.set(!Template.instance().expanded.get());
+  }
+
+
+});
+
+
+Template.scheme_calc_list.helpers({
+
+  scheme_calcs: function () {
+    return Calculations.find({schemeId: this.schemeId}, {sort : {name: 1}});
+  }
+});
+
+
 
 Template.calculation.onCreated(function () {
   var self = this;
