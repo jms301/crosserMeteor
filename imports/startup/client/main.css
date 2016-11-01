@@ -29,6 +29,11 @@ h1 {
     margin-bottom: 20px;
 }
 
+/* icons */
+i.fa-trash {
+  color: white
+}
+
 
 /* Scheme Details */
 
@@ -52,17 +57,43 @@ h1.teal-title {
   font-weight:bold;
 }
 
-div.teal-list {
-  padding-top: 40px;
-  background: teal;
-  border-radius: 15px;
-}
-
 div.teal-no-item {
 
   padding-left: 30px;
   width: 100%;
-  padding-bottom:15px;
+  padding-bottom:20px;
+
+}
+
+div.teal-list {
+  padding-top: 40px;
+
+  background: teal;
+  border-radius: 15px;
+}
+
+table {
+  width: 100%;
+}
+
+table tr td:first-child, th:first-child {
+ padding-left: 30px;
+}
+
+table tr td {
+  border-top: 1px solid black;
+  padding-top: 8px;
+  padding-bottom: 8px;
+
+}
+
+table.teal-list tr:last-child td {
+  padding-bottom: 20px;
+
+}
+
+div#config {
+  max-width: 30%;
 
 }
 
@@ -111,7 +142,13 @@ div.orange-item {
   padding-top: 10px;
 }
 
-
+i.delete-loci {
+  cursor: pointer;
+}
+td.crossLociCell {
+  width: 25%;
+  line-height: 1.5em;
+}
 
 /* saved for later */
 .dropdown-menu > rep > a > li:hover,

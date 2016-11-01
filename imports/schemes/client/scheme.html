@@ -26,15 +26,18 @@
 
 
 
-      <div>Chunk Size: <input id="chunk-size" value="{{convergence_chunk_size}}"/></div>
-      <div>Tolerance:  <input id="tolerance" value="{{convergence_tolerance}}"/></div>
-      <div>Min Plants: <input id="min-plants" value="{{convergence_fewest_plants}}"/></div>
+      <div><h4>Chunk Size:</h4> <input id="chunk-size" value="{{convergence_chunk_size}}"/></div>
+      <div><h4>Tolerance:</h4>  <input id="tolerance" value="{{convergence_tolerance}}"/></div>
+      <div><h4>Fewest Plants:</h4> <input id="min-plants" value="{{convergence_fewest_plants}}"/></div>
 
 </template>
 
 <template name="plant">
   <div class="teal-item">
-  <h3 class="item-title inline-h"> Parent name:</h3> <input class="parent-name" value="{{plant.name}}"/><button class="delete-parent">X</button>
+  <h3 class="item-title inline-h"> Parent name:</h3> <input class="parent-name" value="{{plant.name}}"/>
+  <div class="pull-right">
+  <button class="btn btn-danger delete-parent"><i class="fa fa-trash-o fa-lg"></i></button>
+  </div>
 
   <div class="orange-title">
     <h4 class="orange-title">
@@ -59,7 +62,7 @@
 
     </table>
     <div class="orange-item">
-      <button class="add-locus">+ Add Locus</button>
+      <button class="btn btn-info add-locus"><i class="fa fa-plus"></i> Add Locus</button>
     </div>
   </div>
   </div>
@@ -67,7 +70,7 @@
 
 <template name="loci">
   <tr>
-    <td><input class="loci-name" value="{{loci.name}}"/></td>
+    <td><input class="loci-name" placeholder="locus name" value="{{loci.name}}"/></td>
     <td><select class="loci-type">
       <option {{isSelected loci.type "Trait"}} value="Trait">Target Gene</option>
       <option {{isSelected loci.type "Marker"}} value="Marker">Marker</option>
@@ -82,7 +85,7 @@
                placeholder="1-{{positionMax loci.linkage_group}}"
                max={{positionMax loci.linkage_group}}
                value = {{loci.position}} /></td>
-    <td><button class="delete-loci">X</button> </td>
+    <td><button class="btn btn-danger delete-locidelete-parent"><i class="fa fa-trash-o fa-lg"></i></button></td>
 
   </tr>
 </template>
@@ -123,7 +126,7 @@
       <option {{isSelected cross.zygosity "Heterozygous"}} value="Heterozygous">Heterozygous</option>
     </select>
     </td>
-    <td>
+    <td class="crossLociCell">
     {{#each l in cross.loci}}
       {{> crossLoci loci=l ci=ci}}
     {{/each}}
@@ -142,17 +145,19 @@
     </select>
     </td>
     <td>
-    <button class="delete-cross">X</button>
+
+    <button class="btn btn-danger delete-cross"><i class="fa fa-trash-o fa-lg"></i></button>
     </td>
   </tr>
 </template>
 
 <template name="crossLoci">
-  <span> {{loci}} <button class="delete-loci">X</button></span>
+  <span class="label label-danger"> {{loci}} <i class="delete-loci fa fa-trash-o fa-lg"></i></span>
 </template>
 
 <template name="chart">
   <div class="teal-item">
+    <h3> Chart {{plusOne chi}} </h3>
     <select class="chart-type">
       <option value="success_table"
       {{isSelected chart.type "success_table"}}>Success Table</option>
@@ -216,8 +221,9 @@
       <input value="{{chart.type}}" class="chart-type-custom" />
       <input value="{{chart.data}}" class="chart-data-custom" />
     {{/unless}}
-
-    <button class="chart-delete">X</button>
+  <div class="pull-right">
+    <button class="btn btn-danger chart-delete"><i class="fa fa-trash-o fa-lg"></i></button>
+  </div>
   </div>
 
 
@@ -234,7 +240,7 @@
   </select>
   <input class="stable-quantity" value="{{stable.quantity}}"/>
   <input class="stable-confidence" value="{{stable.confidence}}"/>
-  <button class="stable-delete">X</button>
+  <button class="btn btn-danger stable-delete"><i class="fa fa-trash-o fa-lg"></i></button>
 </div>
 </template>
 
@@ -248,7 +254,7 @@
     <h1 class="teal-title">Config</h1>
   </div>
 
-  <div class="teal-list teal-no-item">
+  <div id="config" class="teal-no-item teal-list">
     <h3 >Species:</h3>
 		<select id="species">
 			{{#each species in speciesList}}
@@ -272,7 +278,7 @@
       {{> plant plant=p pi=@index}}
     {{/each}}
     <div class="teal-item">
-      <button id="add-parent">+ add parent</button>
+      <button id="add-parent" class="btn btn-info">+ add parent</button>
     </div>
   </div>
 
@@ -281,7 +287,8 @@
   </div>
 
   <div class="teal-list">
-  <table>
+  <table class="teal-list">
+  <thead>
     {{#if scheme.crosses}}
     <tr>
     <th>Name:</th>
@@ -291,16 +298,24 @@
     <th>Loci To Select For:</th>
     </tr>
     {{/if}}
+  </thead>
+  <tbody>
     {{#each c in scheme.crosses}}
       {{> cross cross=c ci=@index}}
     {{/each}}
 
     <tr>
-    <td></td>
     <td>
-      <button id="add-cross">+ add cross</button>
+      <button id="add-cross" class="btn btn-info">+ add cross</button>
     </td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
     </tr>
+  </tbody>
   </table>
   </div>
   <div class="teal-title">
@@ -311,7 +326,7 @@
       {{> chart chart=o chi=@index}}
     {{/each}}
     <div class="teal-item">
-      <button id="add-chart">+ add chart</button>
+      <button id="add-chart" class="btn btn-info">+ add chart</button>
     </div>
   </div>
   <br/>

@@ -493,7 +493,7 @@ Template.loci.helpers({
 });
 
 Template.crossLoci.events({
-  "click button.delete-loci" : function (evt, inst) {
+  "click i.delete-loci" : function (evt, inst) {
 
     var schemeId = FlowRouter.getParam('id');
     var toSet = { };
@@ -508,6 +508,9 @@ Template.crossLoci.events({
 });
 
 Template.chart.helpers({
+  "plusOne" : function (index) {
+    return index + 1;
+  },
   "custom_type" : function (type ) {
     known_types = ["mean_cross_composition", "proportion_distribution",
      "loci_composition", "success_table"];
