@@ -17,13 +17,11 @@
 
     <h3>Simulation Resolution:</h3>
       <select id="resolution">
-        <option value="draft">Draft (Very Low)</option>
-        <option value="low">Low</option>
-        <option value="high">High</option>
         <option value="custom">Custom</option>
+        <option {{isSelected "draft" convergence_chunk_size convergence_fewest_plants convergence_tolerance}} value="draft">Draft (Very Low)</option>
+        <option {{isSelected "low" convergence_chunk_size convergence_fewest_plants convergence_tolerance}} value="low">Low</option>
+        <option {{isSelected "high" convergence_chunk_size convergence_fewest_plants convergence_tolerance}} value="high">High</option>
 		</select>
-
-
 
 
       <div><h4>Chunk Size:</h4> <input id="chunk-size" value="{{convergence_chunk_size}}"/></div>

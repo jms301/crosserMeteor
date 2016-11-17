@@ -15,8 +15,9 @@ Template.schemes.onCreated(function () {
   var self = this;
   self.autorun(function () {
     self.subscribe('schemes');
-    /*if(self.subscriptionsReady()) {
-    }*/
+    if(self.subscriptionsReady()) {
+
+    }
   });
 });
 
@@ -75,35 +76,13 @@ Template.scheme.helpers({
 });
 
 
-//Helper function to update the simulation resolution drop down & custom boxes
-var resetSimulationRes = function () {
-
-  tolerance = $('input#tolerance').val();
-  minPlants = $('input#min-plants').val();
-  chunkSize = $('input#chunk-size').val();
-
-  for (res in default_resolution) {
-    if(chunkSize == default_resolution[res].convergence_chunk_size &&
-       minPlants == default_resolution[res].convergence_fewest_plants &&
-       tolerance == default_resolution[res].convergence_tolerance) {
-
-
-      $('select#resolution').val(res);
-      return
-    }
-
-  }
-  //else
-  $('select#resolution').val('custom');
-
-};
-
 Template.scheme.onRendered(() => {
-  /*self.autorun(() => {
-    resetSimulationRes();
-    TODO this will not work till you remvoe auto-publish since otherwise
-    no way to tell when the data is good
-  });*/
+  Template.instance().autorun(() => {
+    if(Template.instance().subscriptionsReady())
+    {
+
+    }
+  });
 });
 
 Template.scheme.events({
@@ -125,21 +104,18 @@ Template.scheme.events({
     toSet['system.convergence_chunk_size'] = evt.target.value;
     Schemes.update({_id: FlowRouter.getParam('id')},
      {$set : toSet});
-    resetSimulationRes();
   },
   "change input#tolerance" : (evt, inst) => {
     var toSet = {};
     toSet['system.convergence_tolerance'] = evt.target.value;
     Schemes.update({_id: FlowRouter.getParam('id')},
      {$set : toSet});
-    resetSimulationRes();
   },
   "change input#min-plants" : (evt, inst) => {
     var toSet = {};
     toSet['system.convergence_fewest_plants'] = evt.target.value;
     Schemes.update({_id: FlowRouter.getParam('id')},
      {$set : toSet});
-    resetSimulationRes();
   },
   //Plants:
   "click button#add-parent" : () => {
@@ -193,6 +169,16 @@ Template.scheme.events({
   }
 });
 
+Template.simulationResolution.helpers({
+  isSelected : (res, chunkSize, minPlants, tolerance) => {
+
+    return (chunkSize == default_resolution[res].convergence_chunk_size &&
+     minPlants == default_resolution[res].convergence_fewest_plants &&
+     tolerance == default_resolution[res].convergence_tolerance) ? "selected" : "";
+
+  }
+
+});
 Template.simulationResolution.events({
   "change select#resolution" : (evt, inst) => {
     if(evt.target.value == 'custom') {
