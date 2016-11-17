@@ -16,6 +16,7 @@
 <h1>
   Calculation List
 </h1>
+{{#if Template.subscriptionsReady}}
 
 <ul>
 {{#each calc in calcList}}
@@ -24,6 +25,10 @@
   </li>
 {{/each}}
 </ul>
+
+{{else}}
+  Loading... please wait
+{{/if}}
 
 </template>
 
@@ -37,7 +42,6 @@
     {{#if expanded}}
       {{>scheme_calc_list schemeId=calc.schemeId}}
     {{/if}}
-
 </template>
 
 <template name="scheme_calc_list">

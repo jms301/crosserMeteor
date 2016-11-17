@@ -39,7 +39,13 @@
   </nav>
 
   <div class="container">
+    {{#if currentUser}}
       {{>Template.dynamic template=content}}
+    {{else}}
+      Welcome to Crosser.
+
+      Crosser requires you sign up and login, you can do this via the button in the top right corner.
+    {{/if}}
   </div>
 
   <div id="footer">

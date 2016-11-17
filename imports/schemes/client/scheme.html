@@ -2,12 +2,15 @@
 
 <h1>List of your schemes:</h1>
 <ul>
-{{#each s in schemeList}}
-  <li>
-    <A href="{{flowPath 'scheme' s._id}}">{{s.name}} ver: </A> {{s.version}}
-
-  </li>
-{{/each}}
+{{#if Template.subscriptionsReady}}
+  {{#each s in schemeList}}
+    <li>
+      <A href="{{flowPath 'scheme' s._id}}">{{s.name}} ver: </A> {{s.version}}
+    </li>
+  {{/each}}
+{{else}}
+  Loading ...
+{{/if}}
 </ul>
 <button id="create-scheme">New Scheme</button>
 </template>
@@ -340,5 +343,7 @@
   <br/>
 </div>
 </div>
+{{else}}
+  Loading ...
 {{/if}}
 </template>
