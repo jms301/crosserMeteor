@@ -111,6 +111,7 @@ CrossTree.prototype.getAnscestors = function (cross) {
 };
 
 CrossTree.prototype.availableLoci = function (cross) {
+  //console.log("availLoci ran  for: " + cross.name);
   var toRet = [];
   var plants = this.getAnscestors(cross);
   plants = _.uniq(plants);

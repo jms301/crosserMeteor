@@ -202,11 +202,11 @@ Template.cross.events({
 
  "click button.delete-cross" : function (evt, inst) {
 
+
     var old = Schemes.findOne({_id: FlowRouter.getParam('id')});
     var oldName = this.cross.name;// old.crosses[inst.data.ci].name;
 
-    //TODO remove cross from charts.
-
+    //remove the old cross from any other cross parents
     old.crosses.forEach((cross) => {
       if(cross.left == oldName)
         cross.left = "";
@@ -214,11 +214,21 @@ Template.cross.events({
         cross.right = "";
     });
 
+    //remove the old cross from outputs data string.
+    old.outputs.forEach ((output) => {
+      output.data = output.data.replace('"' + oldName + '"', '""');
+    });
+
+    //remove the old cross from cross array.
     old.crosses.splice(this.ci, 1);
 
+    //update cross array
     Schemes.update({_id: FlowRouter.getParam('id')},
      {$set : {crosses:  old.crosses}});
 
+    //update outputs array
+    Schemes.update({_id: FlowRouter.getParam('id')},
+     {$set : {outputs:  old.outputs}});
   },
   "change select.zygosity" : function (evt, inst) {
     var toSet = {};
@@ -261,20 +271,50 @@ Template.cross.events({
     var oldName = old.crosses[inst.data.ci].name;
     var newName = evt.target.value;
 
-    //TODO updated charts with new cross names.
-    //TODO barf if name already in use in cross OR plants.
 
-    old.crosses.forEach((cross) => {
-      if(cross.left == oldName)
-        cross.left = newName;
-      if(cross.right == oldName)
-        cross.right = newName;
-    });
+    for(i=0; i < old.crosses.length; i++) {
+      if(old.crosses[i].name == newName) {
+        evt.target.value = oldName;
+        return;
+      }
+    }
+
+    for(i=0; i < old.plants.length; i++) {
+      if(old.plants[i].name == newName) {
+        evt.target.value = oldName;
+        return;
+      }
+    }
+
+    // Replace the name of the cross
     old.crosses[inst.data.ci].name = newName;
 
+    if(oldName != "") {
+      //update the old cross in outputs data string.
+      old.outputs.forEach((output) => {
+        output.data = output.data.replace('"' + oldName + '"',
+        '"' + newName + '"');
+      });
+
+      //Update the old cross in cross parents
+      old.crosses.forEach((cross) => {
+        if(cross.left == oldName) {
+          cross.left = newName;
+        }
+        if(cross.right == oldName) {
+          cross.right = newName;
+        }
+      });
+    }
+
+
+    //update cross array
     Schemes.update({_id: FlowRouter.getParam('id')},
      {$set : {crosses:  old.crosses}});
 
+    //update outputs array
+    Schemes.update({_id: FlowRouter.getParam('id')},
+     {$set : {outputs:  old.outputs}});
   },
   "change select.lparent": (evt, inst) =>
   {
@@ -365,24 +405,49 @@ Template.plant.events({
     var oldName = old.plants[inst.data.pi].name;
     var newName = evt.target.value;
 
-    //TODO barf if name already in use in cross OR plants.
-    //TODO update chart 'donor' fields.
-    //TODO should re-factor into function?
-    old.crosses.forEach((cross) => {
-      if(cross.left == oldName)
-        cross.left = newName;
-      if(cross.right == oldName)
-        cross.right = newName;
-    });
+    for(i=0; i < old.crosses.length; i++) {
+      if(old.crosses[i].name == newName) {
+        evt.target.value = oldName;
+        return;
+      }
+    }
 
+    for(i=0; i < old.plants.length; i++) {
+      if(old.plants[i].name == newName) {
+        evt.target.value = oldName;
+        return;
+      }
+    }
+
+    if(oldName != "") {
+      //update the old plant in outputs data string.
+      old.outputs.forEach((output) => {
+        output.data = output.data.replace('"' + oldName + '"',
+        '"' + newName + '"');
+      });
+
+      //Update the old plant in cross parents
+      old.crosses.forEach((cross) => {
+        if(cross.left == oldName)
+          cross.left = newName;
+        if(cross.right == oldName)
+          cross.right = newName;
+      });
+    }
+
+    //update cross array
     Schemes.update({_id: FlowRouter.getParam('id')},
      {$set : {crosses:  old.crosses}});
+
+    //update outputs array
+    Schemes.update({_id: FlowRouter.getParam('id')},
+     {$set : {outputs:  old.outputs}});
+
 
     var toSet = {};
     toSet["plants."+inst.data.pi + ".name"] = evt.target.value;
     Schemes.update({_id: FlowRouter.getParam('id')},
       {$set : toSet});
-    //TODO Update the lists of plants in crosses & Charts
 
   }
 });
@@ -424,7 +489,6 @@ Template.loci.events({
       ".name"] = evt.target.value;
     Schemes.update({_id: FlowRouter.getParam('id')},
       {$set : toSet});
-    //TODO Update the lists of Loci in crosses & Charts
   },
   "change select.loci-type" : (evt, inst) => {
     var toSet = {};
@@ -577,6 +641,11 @@ Template.chart.events({
   },
   "click button.success-table-add" : function (evt, inst) {
     this.data = EJSON.parse(this.chart.data);
+
+    // Deal with case of a new success table
+    if(!('require' in this.data)) {
+      this.data = {require: []};
+    }
 
     this.data.require.push( { cross : "", confidence: 0.95, quantity : 5});
     var toSet = {};
