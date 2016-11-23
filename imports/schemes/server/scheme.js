@@ -110,18 +110,39 @@ var processScheme = Meteor.bindEnvironment(function (task, callback) {
 
 export var queue = async.queue(processScheme, 1);
 
+
+//Takes a SchemeHistory and Scheme entry and returns true if they are the same
+function compSchemeHistory(history, scheme) {
+  ignore = ['_id', 'version', 'schemeId'];
+
+  for(key in history) {
+    if (!_.contains(ignore, key) &&
+        !_.isEqual(history[key], scheme[key])) {
+      return false;
+    }
+  }
+  return true;
+}
+
 function backupScheme(scheme) {
+
+
   var lastBackup = SchemeHistory.findOne(
-                   {_schemeId: scheme._id, version: scheme.version-1});
-  //TODO diff old version and current version.
-  scheme.schemeId = scheme._id;
-  delete scheme._id;
-  var historyId = SchemeHistory.insert(scheme);
+                   {schemeId: scheme._id, version: scheme.version-1});
 
-  if(historyId)
-    Schemes.update({_id: scheme.schemeId}, {$inc: {version: 1}});
+  if(!lastBackup || !compSchemeHistory(lastBackup, scheme)) {
 
-  return historyId;
+    scheme.schemeId = scheme._id;
+    delete scheme._id;
+    var historyId = SchemeHistory.insert(scheme);
+
+    if(historyId)
+      Schemes.update({_id: scheme.schemeId}, {$inc: {version: 1}});
+
+    return historyId;
+  } else {
+    return lastBackup._id;
+  }
 }
 
 
@@ -136,11 +157,10 @@ Meteor.methods({
         Schemes.update({_id: schemeId}, {$set: {last_calc_id: calcId}});
 
         queue.push({name: scheme.name + " - v: " + scheme.version, histId: histId, calcId: calcId, status: "Queued"}, (err) => {
-          //TODO deal with errors more gracefully.
           if(err) {
             console.log("Cross processing failed with error!");
             console.log("Error: " + err);
-            throw err;
+            throw new Meteor.Error(500, "Error: " + err);
           }
 
         });
@@ -160,9 +180,8 @@ Meteor.methods({
     var scheme = Schemes.findOne({_id: schemeId});
     if(scheme) {
       if(this.userId && this.userId == scheme.userId) {
-        if(backupScheme(scheme))
-          console.log("Backed up: " +  schemeId +
-                      " ver: " + (scheme.version+1));
+        backupScheme(scheme);
+        console.log("Backed up scheme.")
 
       } else {
         console.log("Attempted backup with wrong user.")

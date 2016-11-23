@@ -92,8 +92,6 @@ Template.scheme.events({
     Schemes.update({_id: FlowRouter.getParam('id')},
      {$set : {species : default_species[evt.target.value]}});
 
-    //TODO refresh loci settings
-
   },
   "change input#scheme-name" : (evt, inst) => {
     Schemes.update({_id: FlowRouter.getParam('id')},
@@ -143,29 +141,26 @@ Template.scheme.events({
   //backup, revert & process
 
   "click button#backup": function (evt, inst) {
-    //TODO confirm
 
     Meteor.call('backupScheme', FlowRouter.getParam('id'));
 
   },
   "click button#revert": function (evt, inst) {
-    //TODO confirm!
-
+    //TODO Make a modal listing the history and allow the creation of a new version from that history.
     Meteor.call('revertScheme', FlowRouter.getParam('id'));
 
   },
   "click button#process" : function (evt, inst) {
-    Meteor.call('processScheme', FlowRouter.getParam('id'),
-      (err, calcId)  => {
-        FlowRouter.go("calculation", {id: calcId});
-        //console.log(calcId);
 
-      }
+    if(confirm("Are you sure you want to start processing your cross?")){
+      Meteor.call('processScheme', FlowRouter.getParam('id'),
+        (err, calcId)  => {
+          FlowRouter.go("calculation", {id: calcId});
+          //console.log(calcId);
+        }
+      );
 
-    );
-
-    //TODO Display modal loading dialog!
-
+    }
   }
 });
 
@@ -472,9 +467,16 @@ Template.loci.events({
     var oldName = old.plants[inst.data.pi].loci[inst.data.li].name;
     var newName = evt.target.value;
 
-    //TODO barf if name already in use in loci
-    //TODO update chart 'donor' fields.
-    //TODO should re-factor into function?
+    //Don't allow duplicate loci names
+    for(i=0; i < old.plants.length; i++) {
+      for(j=0; j < old.plants[i].loci.length; j++) {
+        if(old.plants[i].loci[j].name == newName) {
+          evt.target.value = oldName;
+          return;
+        }
+      }
+    }
+
     old.crosses.forEach((cross) => {
       var i = _.indexOf(cross.loci, oldName, false);
       if(i)
@@ -524,7 +526,7 @@ Template.loci.helpers({
     var schemeId = FlowRouter.getParam('id');
     var scheme = Schemes.findOne({_id: schemeId}) || false;
 
-    if(scheme)
+    if(scheme && scheme.species)
       return scheme.species.chromosome_lengths.length;
     else
       return "?";
@@ -533,11 +535,10 @@ Template.loci.helpers({
     var schemeId = FlowRouter.getParam('id');
     var scheme = Schemes.findOne({_id: schemeId}) || false;
 
-    if(scheme && group)
+    if(scheme && group && scheme.species)
       return scheme.species.chromosome_lengths[group-1];
     else
       return "?"
-
   }
 
 });
