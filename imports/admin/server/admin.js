@@ -3,6 +3,7 @@ import process from 'process';
 
 
 Meteor.publish('queued_tasks', function () {
+  //TODO secure this for admin only
   var published = [];
   const poll = () => {
     var newPublished = [];
@@ -96,7 +97,9 @@ Meteor.publish('working_tasks', function () {
 
 
 Meteor.methods({
+  //TODO secure this for admin only
   killJob: function (calcId) {
+
     var workers = queue.workersList();
     workers.forEach((task) => {
 

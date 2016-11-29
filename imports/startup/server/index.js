@@ -24,9 +24,11 @@ Meteor.publish('calculations', function () {
 });
 
 Meteor.publish('scheme', function (id) {
+    //Only show details of a users own schemes
     return Schemes.find({_id: id, userId: this.userId});
 });
 
 Meteor.publish('schemes', function () {
-    return Schemes.find({userId: this.userId}, {fields: {name: 1, version: 1, last_calc_id: 1}});
+    //Users can see all schemes names/versions/latest calculations
+    return Schemes.find({}, {fields: {name: 1, version: 1, last_calc_id: 1}});
 });
