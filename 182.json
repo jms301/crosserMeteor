@@ -14,10 +14,7 @@
       "left": "F12",
       "loci": [
         "T1.1",
-        "T2.2",
-        "T3.1",
-        "T3.2",
-        "T4.2"
+        "T2.2"
       ],
       "name": "F1234",
       "right": "F34",
@@ -124,7 +121,7 @@
         {
           "linkage_group": 5,
           "name": "T1.1",
-          "position": 9,
+          "position": 9.2,
           "type": "Trait"
         }
       ],
@@ -135,7 +132,7 @@
         {
           "linkage_group": 6,
           "name": "T2.2",
-          "position": 14,
+          "position": 14.1,
           "type": "Trait"
         }
       ],
@@ -150,7 +147,8 @@
         {
           "linkage_group": 11,
           "name": "T3.2",
-          "type": "Trait"
+          "type": "Trait",
+          "position": 10.3
         },
         {
           "linkage_group": 4,
