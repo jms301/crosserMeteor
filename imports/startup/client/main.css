@@ -212,3 +212,14 @@ div.pull-right {
 }
 
 
+ul#login-btn > li > a {
+  color: white;
+  background-color: #116a11;
+}
+
+ul#login-btn > li > a:focus, ul#login-btn > li > a:hover {
+  background-color: #117711;
+}
+
+
+

@@ -164,6 +164,10 @@ Template.scheme.events({
   }
 });
 
+Template.simulationResolution.onRendered(() => {
+  this.$('.tooltipped').tooltip();
+});
+
 Template.simulationResolution.helpers({
   isSelected : (res, chunkSize, minPlants, tolerance) => {
 
