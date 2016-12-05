@@ -18,7 +18,7 @@
 
 <template name="simulationResolution">
 
-    <h3>Simulation Resolution: <i class="tooltipped fa fa-question-circle-o" data-toggle="tooltip" title="a tooltip"></i></h3>
+    <h3>Simulation Resolution: <i class="tooltipped fa fa-question-circle-o" data-toggle="tooltip" title="Simulation granularity: This defines the precision of the analysis. The higher the granularity, the longer the program will take to run. It's recommended to establish that the program is working properly using the 'draft' setting."></i></h3>
 
       <select id="resolution">
         <option value="custom">Custom</option>
@@ -43,7 +43,7 @@
 
   <div class="orange-title">
     <h4 class="orange-title">
-      Loci:
+      Target Genes / Markers:
     </h4>
   </div>
   <div class="orange-list">
@@ -51,10 +51,9 @@
     {{#if plant.loci}}
     <tr>
       <th>Name:</th>
-      <th>Type</th>
       <th>Linkage Group /<br/>
        Chromosome</th>
-      <th>Position</th>
+      <th>Position <i class="tooltipped fa fa-question-circle-o" data-toggle="tooltip" title="Insert the map position of the gene/marker in centiMorgans."></i></th>
       <th></th>
     </tr>
     {{/if}}
@@ -72,14 +71,8 @@
 
 <template name="loci">
   <tr>
-    <td><input class="loci-name" placeholder="target genes / markers" value="{{loci.name}}"/></td>
-    <td>
-
-    <select class="loci-type">
-      <option {{isSelected loci.type "Trait"}} value="Trait">Target Gene</option>
-      <option {{isSelected loci.type "Marker"}} value="Marker">Marker</option>
-    <!--{{loci.type}}-->
-    </select></td>
+    <td><input class="loci-name" placeholder="name of gene / marker" value="{{loci.name}}"/>
+    </td>
 
     <td><input class="linkage-group" style="width:5em;" type="number" min=1
                max={{linkageGroupMax}}
@@ -164,11 +157,11 @@
     <h3> Chart {{plusOne chi}} </h3>
     <select class="chart-type">
       <option value="success_table"
-      {{isSelected chart.type "success_table"}}>Success Table</option>
+      {{isSelected chart.type "success_table"}}>Selection Success Table</option>
       <option value="loci_composition"
-      {{isSelected chart.type "loci_composition"}}>Loci Composition</option>
+      {{isSelected chart.type "loci_composition"}}>Chromosome-by-Chromosome distribution of parental alleles</option>
       <option value="proportion_distribution"
-      {{isSelected chart.type "proportion_distribution"}}>Proportion Distribution</option>
+      {{isSelected chart.type "proportion_distribution"}}>Distribution of the contribution to the Global Genome</option>
       <option value="mean_cross_composition"
       {{isSelected chart.type "mean_cross_composition"}}>Mean Cross Composition</option>
       <option value="custom"
@@ -176,6 +169,10 @@
     </select>
 
     {{#if $eq chart.type "loci_composition"}}
+
+    <i class="tooltipped fa fa-question-circle-o" data-toggle="tooltip" title="This shows, on a chromosome-by-chromosome basis, the contribution of each parent to the genetic make-up of the selected generation. In a backcross programme, one of each chromosome pair will be have a 100% contribution from the recurrent parent. The charts illustrates the effect of linkage drag on a chromosome harbouring an introgressed gene."></i>
+
+    <br/>
       <select class="loci-composition">
         <option></option>
         {{#each cross in all_crosses}}
@@ -185,6 +182,8 @@
     {{/if}}
 
     {{#if $eq chart.type "success_table"}}
+    <i class="tooltipped fa fa-question-circle-o" data-toggle="tooltip" title="This sets out how many individuals need to be screened to achieve a set number of selections at a given probability. The probability should be set as high as possible (typically 0.95)."></i>
+    <br/>
       {{#each stable in parsed_data.require}}
         {{> successTable data=parsed_data stable=stable chi=chi si=@index}}
       {{/each}}
@@ -193,6 +192,9 @@
     {{/if}}
 
     {{#if $eq chart.type "proportion_distribution"}}
+    <i class="tooltipped fa fa-question-circle-o" data-toggle="tooltip" title="This graph shows the expected range in the proportion of the whole genome contributed by a particular parent. In a backcross programme, what is of particular interest is the proportion contributed by the recurrent parent."></i>
+    <br/>
+
     Donor:
 
       <select class="proportion-distribution-donor">
@@ -214,6 +216,8 @@
     {{/if}}
 
     {{#if $eq chart.type "mean_cross_composition"}}
+    <i class="tooltipped fa fa-question-circle-o" data-toggle="tooltip" title="??"></i>
+    <br/>
       <select multiple="" class="mean-cross-data">
       {{#each cross in all_crosses}}
         <option {{isSelectedSet parsed_data.crosses cross}}>{{cross}}</option>
@@ -222,6 +226,9 @@
     {{/if}}
 
     {{#unless custom_type chart.type}}
+
+    <i class="tooltipped fa fa-question-circle-o" data-toggle="tooltip" title="Custom charts are for testing new versions of the Crosser simulation."></i>
+    <br/>
       <input value="{{chart.type}}" class="chart-type-custom" />
       <input value="{{chart.data}}" class="chart-data-custom" />
     {{/unless}}
@@ -296,10 +303,14 @@
     {{#if scheme.crosses}}
     <tr>
     <th>Name:</th>
-    <th><i class="fa fa-mars"></i> Parent:</th>
     <th><i class="fa fa-venus"></i> Parent:</th>
-    <th>Selection Zygosity</th>
-    <th>Loci To Select For:</th>
+    <th><i class="fa fa-mars"></i> Parent:</th>
+    <th>Selection Zygosity
+
+    <i class="tooltipped fa fa-question-circle-o" data-toggle="tooltip" title="Insert the allelic state of the gene/marker. In an F1 this is usually heterozygous, whereas in an F2, the norm is to select for homozygosity."></i>
+
+    </th>
+    <th>Marker To Select For:</th>
     </tr>
     {{/if}}
   </thead>
@@ -312,7 +323,8 @@
     <td>
       <button id="add-cross" class="btn btn-info">+ add cross</button>
     </td>
-    <td></td>
+    <td>
+    </td>
     <td></td>
     <td></td>
     <td></td>
