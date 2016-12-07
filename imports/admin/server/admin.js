@@ -3,7 +3,13 @@ import process from 'process';
 
 
 Meteor.publish('queued_tasks', function () {
-  //TODO secure this for admin only
+
+  if(!this.userId || Meteor.users.findOne({_id: this.userId}).admin != 1) {
+    console.log("non-admin user attempted to sub-queued_tasks");
+    throw new Meteor.Error(403, "Un-authorized attempt has been logged");
+    return;
+  }
+
   var published = [];
   const poll = () => {
     var newPublished = [];
@@ -48,6 +54,12 @@ Meteor.publish('queued_tasks', function () {
 });
 
 Meteor.publish('working_tasks', function () {
+
+  if(!this.userId || Meteor.users.findOne({_id: this.userId}).admin != 1) {
+    console.log("non-admin user attempted to sub-working_tasks");
+    throw new Meteor.Error(403, "Un-authorized attempt has been logged");
+    return;
+  }
 
   var published = [];
 
@@ -99,6 +111,12 @@ Meteor.publish('working_tasks', function () {
 Meteor.methods({
   //TODO secure this for admin only
   killJob: function (calcId) {
+
+    if(!Meteor.user() || Meteor.user().admin != 1) {
+      console.log("non-admin user attempted to kill job");
+      throw new Meteor.Error(403, "Un-authorized attempt has been logged");
+      return;
+    }
 
     var workers = queue.workersList();
     workers.forEach((task) => {

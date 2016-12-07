@@ -17,3 +17,7 @@ import '../imports/calculations/client/calc.js';
 
 import '../imports/admin/client/admin.html';
 import '../imports/admin/client/admin.js';
+
+//Import landing page
+
+import '../imports/landing/client/landing.html';

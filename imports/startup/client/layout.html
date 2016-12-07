@@ -20,14 +20,18 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="#">Crosser</a>
+        <a class="navbar-brand" href="/">Crosser</a>
       </div>
       <div id="navbar" class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
-          <li class="active"><a href="#">Home</a></li>
-          <li><a href="/schemes">Schemes</a></li>
+          <li class="active"><a href="/">Home</a></li>
+          {{#if currentUser}}
+            <li><a href="/schemes">Schemes</a></li>
+          {{/if}}
           <li><a href="/calculations">Calculations</a></li>
-          <li><a href="/admin">Admin</a></li>
+          {{#if isAdmin}}
+            <li><a href="/admin">Admin</a></li>
+          {{/if}}
           <li><a href="/contact">Contact</a></li>
         </ul>
 
@@ -39,13 +43,24 @@
   </nav>
 
   <div class="container">
+  {{#if isInsecurePage content}}
+
+    {{>Template.dynamic template=content}}
+
+  {{else}}
     {{#if currentUser}}
       {{>Template.dynamic template=content}}
     {{else}}
-      Welcome to Crosser.
+      <h1>Welcome to Crosser.</h1>
 
-      Crosser requires you sign up and login, you can do this via the button in the top right corner.
+<p>Crosser is a program to explore plant breeding strategies. The user enters the donor plants and a crossing scheme, and Crosser calculates the proportion of the genome that comes from the recombinant parent, and the number of offspring that need to be tested to give a 95% chance of having 5 plants with the desired traits. </p>
+<p>Crosser deals with averages, so the outputs are of the average situation. In real life, there is of course a range of possible outcomes around this.</p>
+
+<p>Crosser is open source software built and maintained by the Kirkhouse Trust. You can find a copy of the crosser source code on Git Hub.</p>
+
+<p>To use Crosser please click the green button in the top right corner to create an account or sign in.</p>
     {{/if}}
+  {{/if}}
   </div>
 
   <div id="footer">

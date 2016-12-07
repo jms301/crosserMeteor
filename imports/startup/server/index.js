@@ -2,6 +2,12 @@ import { Meteor } from 'meteor/meteor';
 
 
 
+DDPRateLimiter.addRule({type: 'method'}, 10, 1000);
+DDPRateLimiter.addRule({type: 'subscription'}, 10, 1000);
+DDPRateLimiter.addRule({type: 'subscription', name: "working_tasks"}, 1, 5000);
+DDPRateLimiter.addRule({type: 'subscription', name: "queued_tasks"}, 1, 5000);
+
+
 Meteor.startup(() => {
 
     WebApp.addHtmlAttributeHook( () => {

@@ -20,3 +20,8 @@ Template.registerHelper("$eq", (a, b) => {
     return (a == b);
 });
 
+Template.registerHelper("isAdmin", () => {
+
+  return (Meteor.user() && Meteor.user().profile.admin == 1);
+
+});

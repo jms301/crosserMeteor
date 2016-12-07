@@ -7,7 +7,7 @@ Template.admin.onCreated(function () {
     self.subscribe('working_tasks');
     self.subscribe('queued_tasks');
     if(self.subscriptionsReady()) {
-			console.log("subscribed");
+
     }
   });
 });

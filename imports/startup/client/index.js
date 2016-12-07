@@ -1,6 +1,7 @@
 import './routes.js';
 import './main.css';
 import './layout.html';
+import './layout.js';
 import './helpers.js';
 
 
