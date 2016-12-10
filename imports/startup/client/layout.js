@@ -1,5 +1,11 @@
+var noLogin = ["landing", "contact", "calculations"];
+
 Template.mainLayout.helpers({
   isInsecurePage : (page) => {
-    console.log(page);
+    if(_.contains(noLogin, page)) {
+      return true;
+    } else {
+      return false;
+    }
   }
 });
