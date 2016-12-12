@@ -38,3 +38,13 @@ Meteor.publish('schemes', function () {
     //Users can see all schemes names/versions/latest calculations
     return Schemes.find({}, {fields: {name: 1, version: 1, last_calc_id: 1}});
 });
+
+Meteor.publish('schemes_history', function (id) {
+  return SchemeHistory.find({schemeId: id }, {fields: {name: 1, version: 1, _id: 1}});
+
+});
+
+Meteor.publish('historic_scheme', function (id, ver) {
+  return SchemeHistory.find({schemeId: id, version: parseInt(ver)});
+
+});

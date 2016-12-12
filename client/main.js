@@ -4,9 +4,9 @@ import '../imports/startup/collections.js';
 //Import global startup code
 import '../imports/startup/client/index.js';
 
-//Import scheme code
-import '../imports/schemes/client/scheme.html';
-import '../imports/schemes/client/scheme.js';
+//Import all scheme code
+import '../imports/schemes/client/index.js';
+
 
 //Import Calculations code
 
@@ -21,3 +21,5 @@ import '../imports/admin/client/admin.js';
 //Import landing page
 
 import '../imports/landing/client/landing.html';
+//Import contactd page
+import '../imports/contact/client/contact.html';

@@ -5,6 +5,13 @@ FlowRouter.route('/', {
   }
 });
 
+FlowRouter.route('/contact', {
+  name: 'contact',
+  action: function() {
+    BlazeLayout.render("mainLayout", {content: "contact" });
+  }
+});
+
 FlowRouter.route('/scheme/:id', {
   name: 'scheme',
   action: function() {
@@ -40,3 +47,9 @@ FlowRouter.route('/admin', {
   }
 });
 
+FlowRouter.route('/schemeBackup/:id/version/:ver', {
+  name: 'historic_scheme',
+  action: function() {
+    BlazeLayout.render("mainLayout", {content: "schemeDisplay"});
+  }
+});
