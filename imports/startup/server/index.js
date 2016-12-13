@@ -39,12 +39,15 @@ Meteor.publish('schemes', function () {
     return Schemes.find({}, {fields: {name: 1, version: 1, last_calc_id: 1}});
 });
 
-Meteor.publish('schemes_history', function (id) {
-  return SchemeHistory.find({schemeId: id }, {fields: {name: 1, version: 1, _id: 1}});
+Meteor.publish('historic_schemes', function (id) {
+  return SchemeHistory.find({schemeId: id }, {fields: {schemeId: 1, name: 1, version: 1, _id: 1}});
 
 });
 
 Meteor.publish('historic_scheme', function (id, ver) {
   return SchemeHistory.find({schemeId: id, version: parseInt(ver)});
+});
 
+Meteor.publish('historic_scheme_id', function (id) {
+  return SchemeHistory.find({_id: id});
 });

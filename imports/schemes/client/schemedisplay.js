@@ -8,31 +8,38 @@ import { EJSON } from 'meteor/ejson';
 
 
 
-Template.schemes.onCreated(function () {
+Template.backups.onCreated(function () {
   var self = this;
+
   self.autorun(function () {
-    self.subscribe('schemes');
+    self.subscribe('historic_schemes', FlowRouter.getParam('id'));
+
     if(self.subscriptionsReady()) {
 
     }
   });
 });
 
-
-Template.schemes.helpers({
-  schemeList: () => {
-      return Schemes.find();
+Template.backups.helpers({
+  backupList: () => {
+      var schemeId = FlowRouter.getParam('id');
+      return SchemeHistory.find({schemeId: schemeId}, {sort: {version: -1}});
     }
 });
 
-Template.schemeDisplay.onCreated(function () {
+Template.backup.onCreated(function () {
   var self = this;
 
   self.autorun(function () {
 
-    var schemeId = FlowRouter.getParam('id');
+    var id = FlowRouter.getParam('id');
     var ver = parseInt(FlowRouter.getParam('ver'));
-    self.subscribe('historic_scheme', schemeId, ver);
+
+    if(FlowRouter.getRouteName() == 'scheme_backup_id') {
+      self.subscribe('historic_scheme_id', id);
+    } else {
+      self.subscribe('historic_scheme', id, ver);
+    }
 
     if(self.subscriptionsReady()) {
 
@@ -41,12 +48,16 @@ Template.schemeDisplay.onCreated(function () {
 });
 
 
-Template.schemeDisplay.helpers({
+Template.backup.helpers({
   scheme: () => {
-    var schemeId = FlowRouter.getParam('id');
+    var id = FlowRouter.getParam('id');
+
+
+    if(FlowRouter.getRouteName() == 'scheme_backup_id')
+      return SchemeHistory.findOne({_id: id}) || {};
     var ver = parseInt(FlowRouter.getParam('ver'));
 
-    return SchemeHistory.findOne({schemeId: schemeId, version: ver}) || {};
+    return SchemeHistory.findOne({schemeId: id, version: ver}) || {};
   },
   speciesList: () => {
     return _.map(default_species , (val, key, list) => {

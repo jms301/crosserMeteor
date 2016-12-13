@@ -1,18 +1,17 @@
-<template name="schemesDisplay">
+<template name="backups">
+<h1>List of backups for scheme </h1>
 
-<h1>List of your schemes:</h1>
 <ul>
 {{#if Template.subscriptionsReady}}
-  {{#each s in schemeList}}
+  {{#each s in backupList}}
     <li>
-      <A href="{{flowPath 'scheme' s._id}}">{{s.name}} ver: </A> {{s.version}}
+      <A href="{{flowPath 'scheme_backup' s.schemeId s.version}}">{{s.name}} ver: </A> {{s.version}}
     </li>
   {{/each}}
 {{else}}
   Loading ...
 {{/if}}
 </ul>
-<button id="create-scheme">New Scheme</button>
 </template>
 
 
@@ -152,7 +151,7 @@
 </div>
 </template>
 
-<template name="schemeDisplay">
+<template name="backup">
 
 {{#if Template.subscriptionsReady}}
 <div class="row">

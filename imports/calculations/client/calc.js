@@ -46,7 +46,7 @@ Template.calc_list_item.events({
 Template.scheme_calc_list.helpers({
 
   scheme_calcs: function () {
-    return Calculations.find({schemeId: this.schemeId}, {sort : {name: 1}});
+    return Calculations.find({schemeId: this.schemeId}, {sort : {schemeId: 1, startTime: -1}});
   }
 });
 

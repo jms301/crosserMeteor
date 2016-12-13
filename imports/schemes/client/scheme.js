@@ -145,9 +145,9 @@ Template.scheme.events({
     Meteor.call('backupScheme', FlowRouter.getParam('id'));
 
   },
-  "click button#revert": function (evt, inst) {
-    //TODO Make a modal listing the history and allow the creation of a new version from that history.
-    Meteor.call('revertScheme', FlowRouter.getParam('id'));
+
+  "click button#view-backups": function (evt, inst) {
+    FlowRouter.go("scheme_backups", {id: FlowRouter.getParam('id')});
 
   },
   "click button#process" : function (evt, inst) {

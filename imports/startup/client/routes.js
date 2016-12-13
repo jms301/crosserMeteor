@@ -47,9 +47,25 @@ FlowRouter.route('/admin', {
   }
 });
 
-FlowRouter.route('/schemeBackup/:id/version/:ver', {
-  name: 'historic_scheme',
+FlowRouter.route('/backup/:id', {
+  name: 'scheme_backup_id',
   action: function() {
-    BlazeLayout.render("mainLayout", {content: "schemeDisplay"});
+    BlazeLayout.render("mainLayout", {content: "backup"});
   }
 });
+
+
+FlowRouter.route('/backup/:id/version/:ver', {
+  name: 'scheme_backup',
+  action: function() {
+    BlazeLayout.render("mainLayout", {content: "backup"});
+  }
+});
+
+FlowRouter.route('/schemeBackups/:id' , {
+  name: 'scheme_backups',
+  action: function() {
+    BlazeLayout.render("mainLayout", {content: "backups"});
+  }
+});
+

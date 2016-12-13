@@ -15,6 +15,9 @@ Template.registerHelper("flowPath", (name, id) => {
     return FlowRouter.path(name, {id: id}, {});
 });
 
+Template.registerHelper("flowPath", (name, id, ver) => {
+    return FlowRouter.path(name, {id: id, ver: ver}, {});
+});
 
 Template.registerHelper("$eq", (a, b) => {
     return (a == b);
