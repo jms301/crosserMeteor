@@ -136,7 +136,7 @@ Template.scheme.events({
   //charts
   "click button#add-chart" : () => {
     Schemes.update({_id: FlowRouter.getParam('id')},
-      {$push : {'outputs': {'name':'', 'data' : '' }}});
+      {$push : {'outputs': {'type':'success_table', 'data' : '' }}});
   },
   //backup, revert & process
 
@@ -572,7 +572,11 @@ Template.chart.helpers({
     return _.contains(known_types, type);
   },
   "parsed_data" : function () {
-    return EJSON.parse(this.chart.data);
+    if(this.chart && this.chart.data)
+      return EJSON.parse(this.chart.data);
+    else
+      return {};
+
 
   },
   "all_crosses" : function () {
@@ -644,8 +648,11 @@ Template.chart.events({
     Schemes.update({_id: FlowRouter.getParam('id')},
       {$set: toSet });
   },
-  "click button.success-table-add" : function (evt, inst) {
-    this.data = EJSON.parse(this.chart.data);
+  "click button.add-success-table" : function (evt, inst) {
+    if(this.chart.data && this.chart.data != "")
+      this.data = EJSON.parse(this.chart.data);
+    else
+      this.data = {};
 
     // Deal with case of a new success table
     if(!('require' in this.data)) {

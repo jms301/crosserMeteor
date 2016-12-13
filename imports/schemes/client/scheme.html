@@ -156,6 +156,8 @@
   <div class="teal-item">
     <h3> Chart {{plusOne chi}} </h3>
     <select class="chart-type">
+      <option value="custom"
+      {{isSelected chart.type "custom"}}>Custom</option>
       <option value="success_table"
       {{isSelected chart.type "success_table"}}>Selection Success Table</option>
       <option value="loci_composition"
@@ -164,8 +166,6 @@
       {{isSelected chart.type "proportion_distribution"}}>Distribution of the contribution to the Global Genome</option>
       <option value="mean_cross_composition"
       {{isSelected chart.type "mean_cross_composition"}}>Mean Cross Composition</option>
-      <option value="custom"
-      {{isSelected chart.type "custom"}}>Custom</option>
     </select>
 
     {{#if $eq chart.type "loci_composition"}}
@@ -188,7 +188,7 @@
         {{> successTable data=parsed_data stable=stable chi=chi si=@index}}
       {{/each}}
 
-      <button class="success-table-add"> + </button>
+      <button class="add-success-table"> + </button>
     {{/if}}
 
     {{#if $eq chart.type "proportion_distribution"}}
