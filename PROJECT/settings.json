@@ -1,0 +1,6 @@
+{
+  "CROSS_DIR" : "/home/crosser/static/",
+  "CROSS_EXE" : "/home/crosser/crosser/runCrosser.sh",
+  "CROSS_R_EXE" : "/home/crosser/crosser/runR.RScript",
+  "CROSS_EXE_DIR" : "/home/crosser/crosser/"
+}
