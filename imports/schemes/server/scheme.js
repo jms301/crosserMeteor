@@ -19,7 +19,7 @@ if (typeof(cr_exe) == 'undefined')
   throw "Missing CROSS_EXE setting in settings.json";
 
 if (typeof(r_exe) == 'undefined')
-  throw "Missing CROSS_EXE setting in settings.json";
+  throw "Missing CROSS_R_EXE setting in settings.json";
 
 if (typeof(cr_exe_dir) == 'undefined')
   throw "Missing CROSS_EXE_DIR setting in settings.json";
@@ -31,7 +31,7 @@ var processScheme = Meteor.bindEnvironment(function (task, callback) {
   Calculations.update({_id: task.calcId}, {$set : { startTime : new Date()}});
   outputdir = cr_dir + task.calcId + "/";
 
-  task.child = spawn(cr_exe , ['-o' + outputdir, '-u http://127.0.0.1:3000/api/' + task.histId], {"cwd": cr_exe_dir, "detached": true});
+  task.child = spawn(cr_exe , ['-o' + outputdir, '-u ' + Meteor.absoluteUrl() + 'api/' + task.histId], {"cwd": cr_exe_dir, "detached": true});
 
   task.status = "Running Crosser";
   var stdOut = "";
