@@ -1,0 +1,25 @@
+[Unit]
+Description=The crosser meteor webservice
+Requires=mongodb.service
+After=mongodb.service
+
+[Service]
+ExecStart=/usr/bin/nodejs /home/crosser/crosserMeteorBundle/main.js
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=crosserMeteor
+User=crosser
+Group=crosser
+Environment=NODE_ENV=production
+Environment=PWD=
+Environment=PORT=8080
+Environment=HTTP_FORWARDED_COUNT=1
+Environment=MONGO_URL=
+Environment=ROOT_URL=
+Environment='METEOR_SETTINGS={ "CROSS_DIR" : "", "CROSS_EXE" : "", "CROSS_R_EXE" : "", "CROSS_EXE_DIR" : "" }'
+
+#Environment=MONGO_OPLOG_URL=
+
+[Install]
+WantedBy=multi-user.target

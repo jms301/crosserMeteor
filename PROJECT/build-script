@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo "Building & uploading crosser Meteor"
+
+cd ~/Documents/crosserMeteor/
+
+meteor build ../crosserMeteorBuild/
+
+scp ../crosserMeteorBuild/crosserMeteor.tar.gz blueghost@149.202.45.206:~/
