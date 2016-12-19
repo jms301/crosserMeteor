@@ -10,7 +10,7 @@
 
 <template name="mainLayout">
 
-<body>
+
   <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
       <div class="navbar-header">
@@ -42,6 +42,7 @@
     </div>
   </nav>
 
+  <div id="wrap">
   <div class="container">
   {{#if isInsecurePage content}}
 
@@ -62,10 +63,14 @@
     {{/if}}
   {{/if}}
   </div>
+  <div id="push">
+  </div>
+  </div>
 
   <div id="footer">
-    © James Southern 2016
+    <div class="container">
+      <p class="text-muted"> © James Southern 2016 </p>
+    </div>
   </div>
-</body>
 </template>
 

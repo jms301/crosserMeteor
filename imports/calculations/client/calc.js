@@ -79,7 +79,7 @@ Template.calculation.helpers({
 
 Template.results.helpers({
   'pdfUrl' : function ( calc ) {
-    return "/static/" + calc._id + "/plots.pdf";
+    return Meteor.absoluteUrl() + "static/" + calc._id + "/plots.pdf";
   },
   'resultsUrl' : function ( calc ) {
     return "/static/" + calc._id + "/";
