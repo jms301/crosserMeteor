@@ -22,10 +22,12 @@ Template.backups.onCreated(function () {
 
 Template.backups.helpers({
   backupList: () => {
-      var schemeId = FlowRouter.getParam('id');
-      return SchemeHistory.find({schemeId: schemeId}, {sort: {version: -1}});
-    }
+    var schemeId = FlowRouter.getParam('id');
+    return SchemeHistory.find({schemeId: schemeId}, {sort: {version: -1}});
+  },
+
 });
+
 
 Template.backup.onCreated(function () {
   var self = this;
@@ -35,18 +37,43 @@ Template.backup.onCreated(function () {
     var id = FlowRouter.getParam('id');
     var ver = parseInt(FlowRouter.getParam('ver'));
 
+//It is possible to load backup template from one of two routes so
+// Detect which route and subscribe to the right data.
     if(FlowRouter.getRouteName() == 'scheme_backup_id') {
       self.subscribe('historic_scheme_id', id);
     } else {
       self.subscribe('historic_scheme', id, ver);
     }
-
-    if(self.subscriptionsReady()) {
-
-    }
   });
 });
 
+
+Template.backup.events({
+  "click button#revert" : function () {
+    //It is possible to load backup template from one of two routes so
+    // Detect which route and subscribe to the right data.
+
+    var id = FlowRouter.getParam('id');
+		var hist_scheme;
+    if(FlowRouter.getRouteName() == 'scheme_backup_id') {
+      hist_scheme = SchemeHistory.findOne({_id: id});
+    } else {
+	    var ver = parseInt(FlowRouter.getParam('ver'));
+      hist_scheme = SchemeHistory.findOne({schemeId: id, version: ver});
+    }
+
+    if(hist_scheme) {
+      Meteor.call('revertScheme', hist_scheme._id, (err, rev_id) => {
+        if(err) {
+          console.log(err);
+          alert("Revert failed!");
+        } else {
+          FlowRouter.go("scheme", {id: rev_id});
+        }
+      });
+    }
+  }
+});
 
 Template.backup.helpers({
   scheme: () => {
@@ -63,7 +90,7 @@ Template.backup.helpers({
     return _.map(default_species , (val, key, list) => {
       return {name: val.name, value: key};
     });
-  }
+  },
 });
 
 
@@ -84,35 +111,6 @@ Template.simulationResolution.onRendered(() => {
   this.$('.tooltipped').tooltip();
 });
 
-
-Template.simulationResolution.events({
-
-});
-
-Template.cross.events({
-
-});
-
-Template.cross.helpers({
-
-});
-
-
-Template.plant.events({
-
-});
-
-Template.loci.events({
-
-});
-
-Template.loci.helpers({
-
-});
-
-Template.crossLoci.events({
-
-});
 
 Template.chartDisplay.helpers({
   "plusOne" : function (index) {
@@ -139,13 +137,3 @@ Template.chartDisplay.helpers({
   },
 });
 
-Template.chart.events({
-
-});
-
-Template.successTable.helpers({
-});
-
-Template.successTable.events({
-
-});

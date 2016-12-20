@@ -24,14 +24,14 @@ Template.schemes.onCreated(function () {
 
 Template.schemes.helpers({
   schemeList: () => {
-      return Schemes.find();
+      return Schemes.find({userId: Meteor.userId()});
     }
 });
 
 Template.schemes.events({
   "click button#create-scheme" : function (evt,inst) {
-    //TODO run this on server.
-    Schemes.insert({
+
+    var id = Schemes.insert({
       userId : Meteor.userId(),
       version : 1,
       system : {
@@ -43,6 +43,8 @@ Template.schemes.events({
       crosses : [],
       outputs : []
     });
+
+    FlowRouter.go("scheme", {id: id});
   }
 
 
@@ -142,7 +144,18 @@ Template.scheme.events({
 
   "click button#backup": function (evt, inst) {
 
-    Meteor.call('backupScheme', FlowRouter.getParam('id'));
+    Meteor.call('backupScheme', FlowRouter.getParam('id'), (err, bkup) => {
+      if(err) {
+        console.log(err);
+        alert("Backup failed!");
+
+      } else {
+        if(bkup.backup)
+          alert("Scheme Backed Up.");
+        if(!bkup.backup)
+          alert("No change since last backup.");
+      }
+    });
 
   },
 
@@ -333,46 +346,47 @@ Template.cross.events({
 
 Template.cross.helpers({
   optionsPlantsForSelect: function () {
-    var scheme = Schemes.findOne({_id: FlowRouter.getParam('id')});
-    return _.map(scheme.plants, (plant) => { return plant.name});
+    if(Template.instance().subscriptionsReady()) {
+      var scheme = Schemes.findOne({_id: FlowRouter.getParam('id')});
+      return _.map(scheme.plants, (plant) => { return plant.name});
+    }
 
   },
   optionsCrossesForSelect: function (cross) {
-    var scheme = Schemes.findOne({_id: FlowRouter.getParam('id')});
-    var toRet = _.reduce(scheme.crosses, function (arry, obj) {
-      if (obj.name) {
-        arry.push(obj.name);
+    if(Template.instance().subscriptionsReady()) {
+      var scheme = Schemes.findOne({_id: FlowRouter.getParam('id')});
+      var toRet = _.reduce(scheme.crosses, function (arry, obj) {
+        if (obj.name) {
+          arry.push(obj.name);
+        }
+        return arry;
+      }, []);
+
+
+      if(!cross || !cross.name) {
+        //current cross can't be in the tree so it can have parents.
+        return toRet;
       }
-      return arry;
-    }, []);
 
+      descFound = CTree.getDescendants(cross);
 
-    if(!cross || !cross.name) {
-      //current cross can't be in the tree so it can have parents.
+      toRet = _.filter(toRet, (item, index, list)=> {
+        return !_.contains(descFound, item);
+      });
+
       return toRet;
     }
-
-    if(Template.instance().subscriptionsReady())
-    {
-      descFound = CTree.getDescendants(cross);
-    }
-
-    toRet = _.filter(toRet, (item, index, list)=> {
-
-      return !_.contains(descFound, item);
-
-    });
-    return toRet;
-
   },
 
   optionsAvailableLoci: function (cross) {
-    var toRet = _.uniq(CTree.availableLoci(cross));
+    if(Template.instance().subscriptionsReady()) {
+      var toRet = _.uniq(CTree.availableLoci(cross));
 
-    toRet = _.filter(toRet, (item) => {
-      return !_.contains(cross.loci, item.name);
-    });
-    return toRet;
+      toRet = _.filter(toRet, (item) => {
+        return !_.contains(cross.loci, item.name);
+      });
+      return toRet;
+    }
   }
 });
 

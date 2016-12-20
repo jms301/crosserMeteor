@@ -1,4 +1,4 @@
-var noLogin = ["landing", "contact", "calculations"];
+var noLogin = ["landing", "contact", "calculations", "calculation", "backup"];
 
 Template.mainLayout.helpers({
   isInsecurePage : (page) => {

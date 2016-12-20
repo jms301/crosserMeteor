@@ -5,14 +5,14 @@
 {{#if Template.subscriptionsReady}}
   {{#each s in schemeList}}
     <li>
-      <A href="{{flowPath 'scheme' s._id}}">{{s.name}} ver: </A> {{s.version}}
+      <A href="{{flowPath 'scheme' s._id}}">{{s.name}}</A> version:  {{s.version}}
     </li>
   {{/each}}
 {{else}}
   Loading ...
 {{/if}}
 </ul>
-<button id="create-scheme">New Scheme</button>
+<button class="btn btn-primary" id="create-scheme">New Scheme</button>
 </template>
 
 
@@ -259,7 +259,7 @@
 {{#if Template.subscriptionsReady}}
 <div class="row">
 <div class="col-md-12">
-  <h1>Edit Scheme: <input id="scheme-name" value="{{scheme.name}}"/> Ver: {{scheme.version}}</h1>
+  <h1>Edit Scheme: <input id="scheme-name" value="{{scheme.name}}"/> Version: {{scheme.version}}</h1>
 
   <div class="teal-title">
     <h1 class="teal-title">Config</h1>

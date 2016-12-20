@@ -124,6 +124,27 @@ function compSchemeHistory(history, scheme) {
   return true;
 }
 
+function revertScheme(scheme, historic) {
+
+  var id = scheme._id;
+  //first up backup the scheme!
+  backupScheme(scheme);
+  // WARNING backup modifies the scheme object.
+  // This is OK for us because we're replacing it with the historic version.
+  scheme = Schemes.findOne({_id: id});
+
+  historic._id = historic.schemeId;
+  historic.version = scheme.version;
+  delete historic.schemeId;
+  if(Schemes.update({_id: historic._id}, historic) == 1) {
+    return historic._id;
+  } else {
+    throw new Meteor.Error(500, "Error: Failed to update scheme. ");
+  }
+
+}
+
+
 function backupScheme(scheme) {
 
 
@@ -139,9 +160,9 @@ function backupScheme(scheme) {
     if(historyId)
       Schemes.update({_id: scheme.schemeId}, {$inc: {version: 1}});
 
-    return historyId;
+    return {_id: historyId, backup: true};
   } else {
-    return lastBackup._id;
+    return {_id: lastBackup._id, backup: false};
   }
 }
 
@@ -151,7 +172,7 @@ Meteor.methods({
     var scheme = Schemes.findOne({_id: schemeId});
     if(scheme) {
       if(this.userId && this.userId == scheme.userId) {
-        var histId = backupScheme(scheme);
+        var histId = backupScheme(scheme)._id;
         var calcId = create_calc(scheme.name + " - v:" + scheme.version, schemeId, histId, this.userId);
 
         Schemes.update({_id: schemeId}, {$set: {last_calc_id: calcId}});
@@ -180,8 +201,7 @@ Meteor.methods({
     var scheme = Schemes.findOne({_id: schemeId});
     if(scheme) {
       if(this.userId && this.userId == scheme.userId) {
-        backupScheme(scheme);
-        console.log("Backed up scheme.")
+        return backupScheme(scheme);
 
       } else {
         console.log("Attempted backup with wrong user.")
@@ -191,5 +211,26 @@ Meteor.methods({
       console.log("Failed to find backup for scheme.");
       throw new Meteor.Error(404, "No such scheme.");
     }
+  },
+  'revertScheme' : function (historicId) {
+    var backup = SchemeHistory.findOne({_id: historicId});
+    var scheme = Schemes.findOne({_id: backup.schemeId});
+
+    if(scheme) {
+      if(this.userId && this.userId == scheme.userId &&
+        this.userId == backup.userId) {
+         return revertScheme(scheme, backup);
+      } else {
+        console.log("Attempted backup with wrong user.")
+        throw new Meteor.Error(401, "User not authorized");
+      }
+    } else {
+      console.log("Failed to find backup for scheme.");
+      throw new Meteor.Error(404, "No such scheme.");
+    }
+  },
+  'ownCopyScheme' : function (historicId) {
+
+
   }
 });

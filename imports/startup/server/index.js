@@ -36,7 +36,7 @@ Meteor.publish('scheme', function (id) {
 
 Meteor.publish('schemes', function () {
     //Users can see all schemes names/versions/latest calculations
-    return Schemes.find({}, {fields: {name: 1, version: 1, last_calc_id: 1}});
+    return Schemes.find({}, {fields: {userId: 1, name: 1, version: 1, last_calc_id: 1}});
 });
 
 Meteor.publish('historic_schemes', function (id) {
