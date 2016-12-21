@@ -5,7 +5,11 @@
 {{#if Template.subscriptionsReady}}
   {{#each s in backupList}}
     <li>
-      <A href="{{flowPath 'scheme_backup' s.schemeId s.version}}">{{s.name}} ver: </A> {{s.version}}
+      {{#if s.name}}
+        <A href="{{flowPath 'scheme_backup' s.schemeId s.version}}">{{s.name}}</A> version: {{s.version}}
+      {{else}}
+        <A href="{{flowPath 'scheme_backup' s.schemeId s.version}}">&lt;Blank Name&gt;</A> version: {{s.version}}
+      {{/if}}
     </li>
   {{/each}}
 {{else}}

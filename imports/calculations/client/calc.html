@@ -33,11 +33,15 @@
 </template>
 
 <template name="calc_list_item">
- <A href="{{flowPath 'calculation' calc._id}}">{{calc.name}}</A>
+  {{#if calc.name}}
+    <A href="{{flowPath 'calculation' calc._id}}">{{calc.name}}</A>
+  {{else}}
+    <A href="{{flowPath 'calculation' calc._id}}">&lt;Blank Name&gt;</A>
+  {{/if}}
     {{#if expanded}}
-      <button>-</button>
+      <span><i class="fa fa-sort-up"></i></span>
     {{else}}
-      <button>+</button>
+      <span><i class="fa fa-sort-desc"></i></span>
     {{/if}}
     {{#if expanded}}
       {{>scheme_calc_list schemeId=calc.schemeId}}

@@ -35,7 +35,7 @@ Template.calc_list_item.helpers({
 
 
 Template.calc_list_item.events({
-  "click button" : function () {
+  "click span" : function () {
     Template.instance().expanded.set(!Template.instance().expanded.get());
   }
 

@@ -7,6 +7,14 @@ import {default_species} from './default.js';
 import { EJSON } from 'meteor/ejson';
 
 
+var getSchemeObject = function () {
+  var id = FlowRouter.getParam('id');
+  if(FlowRouter.getRouteName() == 'scheme_backup_id')
+    return SchemeHistory.findOne({_id: id}) || {};
+
+  var ver = parseInt(FlowRouter.getParam('ver'));
+  return SchemeHistory.findOne({schemeId: id, version: ver}) || {};
+};
 
 Template.backups.onCreated(function () {
   var self = this;
@@ -49,18 +57,29 @@ Template.backup.onCreated(function () {
 
 
 Template.backup.events({
+  "click button#copy" : function () {
+
+
+    scheme = getSchemeObject();
+    delete scheme.schemeId;
+    delete scheme._id;
+    scheme.userId = Meteor.userId();
+    scheme.version = 1;
+
+
+    var id = Schemes.insert(scheme);
+
+    FlowRouter.go("scheme", {id: id});
+
+  },
   "click button#revert" : function () {
     //It is possible to load backup template from one of two routes so
     // Detect which route and subscribe to the right data.
 
     var id = FlowRouter.getParam('id');
 		var hist_scheme;
-    if(FlowRouter.getRouteName() == 'scheme_backup_id') {
-      hist_scheme = SchemeHistory.findOne({_id: id});
-    } else {
-	    var ver = parseInt(FlowRouter.getParam('ver'));
-      hist_scheme = SchemeHistory.findOne({schemeId: id, version: ver});
-    }
+
+    hist_scheme = getSchemeObject();
 
     if(hist_scheme) {
       Meteor.call('revertScheme', hist_scheme._id, (err, rev_id) => {
@@ -77,14 +96,7 @@ Template.backup.events({
 
 Template.backup.helpers({
   scheme: () => {
-    var id = FlowRouter.getParam('id');
-
-
-    if(FlowRouter.getRouteName() == 'scheme_backup_id')
-      return SchemeHistory.findOne({_id: id}) || {};
-    var ver = parseInt(FlowRouter.getParam('ver'));
-
-    return SchemeHistory.findOne({schemeId: id, version: ver}) || {};
+    return getSchemeObject();
   },
   speciesList: () => {
     return _.map(default_species , (val, key, list) => {
@@ -93,19 +105,6 @@ Template.backup.helpers({
   },
 });
 
-
-Template.scheme.onRendered(() => {
-  Template.instance().autorun(() => {
-    if(Template.instance().subscriptionsReady())
-    {
-
-    }
-  });
-});
-
-Template.scheme.events({
-
-});
 
 Template.simulationResolution.onRendered(() => {
   this.$('.tooltipped').tooltip();
