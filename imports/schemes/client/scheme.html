@@ -272,6 +272,7 @@
   <div id="config" class="teal-no-item teal-list">
     <h3 >Species:</h3>
 		<select id="species">
+      <option></option>
 			{{#each species in speciesList}}
 			<option value='{{species.value}}'
 				{{isSelected species.name scheme.species.name}}
