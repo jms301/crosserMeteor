@@ -97,7 +97,7 @@ Template.scheme.events({
   },
   "change input#scheme-name" : (evt, inst) => {
     Schemes.update({_id: FlowRouter.getParam('id')},
-     {$set : {name : evt.target.value }});
+     {$set : {name : evt.target.value.trim()}});
   },
   "change input#chunk-size" : (evt, inst) => {
     var toSet = {};
@@ -281,8 +281,7 @@ Template.cross.events({
 
     var old = Schemes.findOne({_id: FlowRouter.getParam('id')});
     var oldName = old.crosses[inst.data.ci].name;
-    var newName = evt.target.value;
-
+    var newName = evt.target.value.trim();
 
     for(i=0; i < old.crosses.length; i++) {
       if(old.crosses[i].name == newName) {
@@ -416,7 +415,7 @@ Template.plant.events({
   "change input.parent-name" : (evt, inst) => {
     var old = Schemes.findOne({_id: FlowRouter.getParam('id')});
     var oldName = old.plants[inst.data.pi].name;
-    var newName = evt.target.value;
+    var newName = evt.target.value.trim();
 
     for(i=0; i < old.crosses.length; i++) {
       if(old.crosses[i].name == newName) {
@@ -483,7 +482,7 @@ Template.loci.events({
   "change input.loci-name" : (evt, inst) => {
     var old = Schemes.findOne({_id: FlowRouter.getParam('id')});
     var oldName = old.plants[inst.data.pi].loci[inst.data.li].name;
-    var newName = evt.target.value;
+    var newName = evt.target.value.trim();
 
     //Don't allow duplicate loci names
     for(i=0; i < old.plants.length; i++) {
