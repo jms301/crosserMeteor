@@ -19,16 +19,29 @@
 {{#if Template.subscriptionsReady}}
 
 <ul>
-{{#each calc in calcList}}
-  <li>
-    {{>calc_list_item calc = calc}}
-  </li>
+{{#each user in userList}}
+  <li>{{>user_calc_list user = user }}</li>
+
+
 {{/each}}
 </ul>
 
 {{else}}
   Loading... please wait
 {{/if}}
+
+</template>
+
+<template name="user_calc_list">
+{{userEmail user}}
+<ul>
+{{#each calc in calcList user}}
+  <li>
+    {{>calc_list_item calc = calc}}
+  </li>
+{{/each}}
+</ul>
+
 
 </template>
 
@@ -52,7 +65,7 @@
   <ul>
     {{#each calc in scheme_calcs}}
     <li>
-      <A href="{{flowPath 'calculation' calc._id}}">{{calc.name}}</A>
+      <A href="{{flowPath 'calculation' calc._id}}">{{calc.name}}</A> {{calc.startTime}}
     </li>
     {{/each}}
   </ul>

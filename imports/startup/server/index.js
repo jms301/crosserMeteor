@@ -19,6 +19,11 @@ Meteor.startup(() => {
 
 });
 
+
+Meteor.publish('users', function () {
+  return Meteor.users.find({}, {fields: {emails: 1}});
+})
+
 Meteor.publish('calculation', function (id) {
     return Calculations.find({_id: id});
 });
@@ -26,7 +31,7 @@ Meteor.publish('calculation', function (id) {
 
 //All calculations
 Meteor.publish('calculations', function () {
-  return Calculations.find({}, {fields: {name: 1, schemeId: 1}});
+  return Calculations.find({}, {fields: {name: 1, schemeId: 1, startTime: 1}});
 });
 
 Meteor.publish('scheme', function (id) {

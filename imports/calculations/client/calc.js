@@ -6,20 +6,40 @@ Template.calculations.onCreated(function () {
   var self = this;
   self.autorun(function () {
     self.subscribe('schemes');
+    self.subscribe('users');
     self.subscribe('calculations');
   });
 });
 
 
-Template.calculations.helpers({
+Template.user_calc_list.helpers({
+   userEmail: (user) => {
+    if(user && user.emails && user.emails[0].address) {
+      return user.emails[0].address;
+    } else {
+      return "<blank>";
+    }
+  },
 
-  calcList  : function () {
-    schemes = Schemes.find();
+   calcList  : function (user) {
+    console.log(Schemes.findOne({userId: user._id}));
+    schemes = Schemes.find({userId: user._Id});
+    schemes = Schemes.find({});
     topCalcs = schemes.map ((item) => {
       return Calculations.findOne({_id: item.last_calc_id});
     });
-    return topCalcs;
+    console.log(topCalcs);
+    return _.filter(topCalcs, (o) => { return !!o});
   }
+
+});
+
+Template.calculations.helpers({
+
+ userList : () => {
+    return Meteor.users.find();
+  }
+
 });
 
 Template.calc_list_item.onCreated(function() {
@@ -46,7 +66,7 @@ Template.calc_list_item.events({
 Template.scheme_calc_list.helpers({
 
   scheme_calcs: function () {
-    return Calculations.find({schemeId: this.schemeId}, {sort : {schemeId: 1, startTime: -1}});
+    return Calculations.find({schemeId: this.schemeId}, {sort : {startTime: -1}});
   }
 });
 
