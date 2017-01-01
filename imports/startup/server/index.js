@@ -31,7 +31,7 @@ Meteor.publish('calculation', function (id) {
 
 //All calculations
 Meteor.publish('calculations', function () {
-  return Calculations.find({}, {fields: {name: 1, schemeId: 1, startTime: 1}});
+  return Calculations.find({}, {fields: {name: 1, schemeId: 1, startTime: 1, userId: 1}});
 });
 
 Meteor.publish('scheme', function (id) {

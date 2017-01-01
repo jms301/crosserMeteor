@@ -3,6 +3,7 @@ import 'bootstrap/dist/js/bootstrap.min.js';
 import { ReactiveVar } from 'meteor/reactive-var';
 
 Template.calculations.onCreated(function () {
+
   var self = this;
   self.autorun(function () {
     self.subscribe('schemes');
@@ -11,6 +12,25 @@ Template.calculations.onCreated(function () {
   });
 });
 
+Template.calculations.helpers({
+
+  userList : () => {
+    return Meteor.users.find();
+  },
+  hasCalcs: (user) => {
+    return (Calculations.find({userId: user._id}).count() > 0);
+  }
+
+
+});
+
+Template.user_calc_list.onCreated(function() {
+
+  if (this.data.user._id == Meteor.userId())
+    this.expanded = new ReactiveVar(true);
+  else
+    this.expanded = new ReactiveVar(false);
+});
 
 Template.user_calc_list.helpers({
    userEmail: (user) => {
@@ -22,40 +42,22 @@ Template.user_calc_list.helpers({
   },
 
    calcList  : function (user) {
-    console.log(Schemes.findOne({userId: user._id}));
     schemes = Schemes.find({userId: user._Id});
     schemes = Schemes.find({});
     topCalcs = schemes.map ((item) => {
       return Calculations.findOne({_id: item.last_calc_id});
     });
-    console.log(topCalcs);
     return _.filter(topCalcs, (o) => { return !!o});
-  }
+  },
 
-});
-
-Template.calculations.helpers({
-
- userList : () => {
-    return Meteor.users.find();
-  }
-
-});
-
-Template.calc_list_item.onCreated(function() {
-  this.expanded = new ReactiveVar(false);
-
-});
-
-Template.calc_list_item.helpers({
   expanded : function () {
     return Template.instance().expanded.get();
   }
+
 });
 
-
-Template.calc_list_item.events({
-  "click span" : function () {
+Template.user_calc_list.events({
+  "click span.toggle-user" : function () {
     Template.instance().expanded.set(!Template.instance().expanded.get());
   }
 
@@ -63,10 +65,42 @@ Template.calc_list_item.events({
 });
 
 
+Template.scheme_calc_list.onCreated(function() {
+  this.expanded = new ReactiveVar(false);
+});
+
+
 Template.scheme_calc_list.helpers({
+  expanded : function () {
+    return Template.instance().expanded.get();
+  }
+});
+
+
+Template.scheme_calc_list.events({
+  "click span.toggle-scheme" : function () {
+    Template.instance().expanded.set(!Template.instance().expanded.get());
+  }
+
+
+});
+
+
+Template.calc_list_item.helpers({
 
   scheme_calcs: function () {
     return Calculations.find({schemeId: this.schemeId}, {sort : {startTime: -1}});
+  },
+
+  formatTime: function (time) {
+    if(time)
+    {
+      return time.toLocaleString();
+    } else {
+      return "";
+    }
+
+
   }
 });
 

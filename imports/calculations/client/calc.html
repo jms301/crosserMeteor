@@ -20,7 +20,9 @@
 
 <ul>
 {{#each user in userList}}
-  <li>{{>user_calc_list user = user }}</li>
+  {{#if hasCalcs user}}
+  <li>{{>user_calc_list user = user}}</li>
+  {{/if}}
 
 
 {{/each}}
@@ -34,38 +36,44 @@
 
 <template name="user_calc_list">
 {{userEmail user}}
-<ul>
-{{#each calc in calcList user}}
-  <li>
-    {{>calc_list_item calc = calc}}
-  </li>
-{{/each}}
-</ul>
+{{#if expanded}}
+  <span class="toggle-user"><i class="fa fa-sort-up"></i></span>
+{{else}}
+  <span class="toggle-user"><i class="fa fa-sort-desc"></i></span>
+{{/if}}
 
-
+{{#if expanded}}
+  <ul>
+  {{#each calc in calcList user}}
+    <li>
+      {{>scheme_calc_list calc = calc}}
+    </li>
+  {{/each}}
+  </ul>
+{{/if}}
 </template>
 
-<template name="calc_list_item">
+<template name="scheme_calc_list">
   {{#if calc.name}}
     <A href="{{flowPath 'calculation' calc._id}}">{{calc.name}}</A>
   {{else}}
     <A href="{{flowPath 'calculation' calc._id}}">&lt;Blank Name&gt;</A>
   {{/if}}
     {{#if expanded}}
-      <span><i class="fa fa-sort-up"></i></span>
+      <span class="toggle-scheme"><i class="fa fa-sort-up"></i></span>
     {{else}}
-      <span><i class="fa fa-sort-desc"></i></span>
+      <span class="toggle-scheme"><i class="fa fa-sort-desc"></i></span>
     {{/if}}
     {{#if expanded}}
-      {{>scheme_calc_list schemeId=calc.schemeId}}
+      {{>calc_list_item schemeId=calc.schemeId}}
     {{/if}}
 </template>
 
-<template name="scheme_calc_list">
+<template name="calc_list_item">
   <ul>
     {{#each calc in scheme_calcs}}
     <li>
-      <A href="{{flowPath 'calculation' calc._id}}">{{calc.name}}</A> {{calc.startTime}}
+      <A href="{{flowPath 'calculation' calc._id}}">{{calc.name}}</A> Started: {{formatTime calc.startTime}}
     </li>
     {{/each}}
   </ul>
