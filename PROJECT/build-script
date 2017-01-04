@@ -6,4 +6,4 @@ cd ~/Documents/crosserMeteor/
 
 meteor build ../crosserMeteorBuild/
 
-scp ../crosserMeteorBuild/crosserMeteor.tar.gz blueghost@149.202.45.206:~/
+scp ../crosserMeteorBuild/crosserMeteor.tar.gz crosser.science:~/
