@@ -17,8 +17,11 @@ Queue:
 <br/>
 
 User List:
-
-<br/>
+<ul>
+{{#each email in userEmails}}
+  <li>{{email}}</li>
+{{/each}}
+</ul>
 </template>
 <template name="runningJob">
 
