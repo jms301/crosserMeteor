@@ -11,6 +11,10 @@ style.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font
 
 head.appendChild(style);
 
+Accounts.ui.config({
+  passwordSignupFields: 'USERNAME_AND_EMAIL'
+
+});
 
 import './routes.js';
 import './main.css';

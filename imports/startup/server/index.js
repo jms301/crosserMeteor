@@ -1,12 +1,19 @@
 import { Meteor } from 'meteor/meteor';
-
-
+import { Accounts} from 'meteor/accounts-base';
 
 DDPRateLimiter.addRule({type: 'method'}, 10, 1000);
 DDPRateLimiter.addRule({type: 'subscription'}, 10, 1000);
 DDPRateLimiter.addRule({type: 'subscription', name: "working_tasks"}, 1, 5000);
 DDPRateLimiter.addRule({type: 'subscription', name: "queued_tasks"}, 1, 5000);
 
+
+Accounts.validateNewUser((user) => {
+  if(user.username && user.emails && user.emails[0] &&
+    user.emails[0].address) {
+    return true;
+  }
+  return false;
+});
 
 Meteor.startup(() => {
 
