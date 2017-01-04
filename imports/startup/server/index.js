@@ -33,15 +33,6 @@ Meteor.publish('users', function () {
   return Meteor.users.find({}, {fields: {username: 1}});
 })
 
-//Full user data for admins only
-Meteor.publish('admin-users', function () {
-  if(Meteor.users.findOne({_id: this.userId}).admin == 1) {
-    return Meteor.users.find({});
-  } else {
-    this.ready();
-  }
-});
-
 Meteor.publish('calculation', function (id) {
     return Calculations.find({_id: id});
 });

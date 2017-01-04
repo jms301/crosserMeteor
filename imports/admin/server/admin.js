@@ -2,6 +2,19 @@ import {queue} from '../../schemes/server/scheme.js';
 import process from 'process';
 
 
+//Full user data for admins only
+Meteor.publish('admin-users', function () {
+  var user = Meteor.users.findOne({_id: this.userId})
+
+  if( user && user.admin && user.admin == 1) {
+    return Meteor.users.find({});
+  } else {
+    console.log("non-admin user attempted to admin-users");
+    this.ready();
+  }
+});
+
+
 Meteor.publish('queued_tasks', function () {
 
   if(!this.userId || Meteor.users.findOne({_id: this.userId}).admin != 1) {
@@ -109,7 +122,6 @@ Meteor.publish('working_tasks', function () {
 
 
 Meteor.methods({
-  //TODO secure this for admin only
   killJob: function (calcId) {
 
     if(!Meteor.user() || Meteor.user().admin != 1) {
