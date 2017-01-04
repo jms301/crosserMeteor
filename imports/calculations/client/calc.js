@@ -33,13 +33,6 @@ Template.user_calc_list.onCreated(function() {
 });
 
 Template.user_calc_list.helpers({
-   userEmail: (user) => {
-    if(user && user.emails && user.emails[0].address) {
-      return user.emails[0].address;
-    } else {
-      return "<blank>";
-    }
-  },
 
    calcList  : function (user) {
     schemes = Schemes.find({userId: user._Id});

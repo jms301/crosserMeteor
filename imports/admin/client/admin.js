@@ -5,7 +5,7 @@ Template.admin.onCreated(function () {
   var self = this;
   self.autorun(function () {
     self.subscribe('working_tasks');
-    self.subscribe('users');
+    self.subscribe('admin-users');
     self.subscribe('queued_tasks');
     if(self.subscriptionsReady()) {
 
@@ -26,7 +26,7 @@ Template.admin.helpers({
 
   userEmails: () => {
     return Meteor.users.find().map((user) => {
-      if(user.emails[0] && user.emails[0].address)
+      if(user.emails && user.emails[0] && user.emails[0].address)
         return user.emails[0].address;
       return "";
     });

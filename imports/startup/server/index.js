@@ -7,6 +7,8 @@ DDPRateLimiter.addRule({type: 'subscription', name: "working_tasks"}, 1, 5000);
 DDPRateLimiter.addRule({type: 'subscription', name: "queued_tasks"}, 1, 5000);
 
 
+
+//Check users have both e-mail and username
 Accounts.validateNewUser((user) => {
   if(user.username && user.emails && user.emails[0] &&
     user.emails[0].address) {
@@ -28,8 +30,17 @@ Meteor.startup(() => {
 
 
 Meteor.publish('users', function () {
-  return Meteor.users.find({}, {fields: {emails: 1}});
+  return Meteor.users.find({}, {fields: {username: 1}});
 })
+
+//Full user data for admins only
+Meteor.publish('admin-users', function () {
+  if(Meteor.users.findOne({_id: this.userId}).admin == 1) {
+    return Meteor.users.find({});
+  } else {
+    this.ready();
+  }
+});
 
 Meteor.publish('calculation', function (id) {
     return Calculations.find({_id: id});
