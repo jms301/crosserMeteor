@@ -35,8 +35,7 @@ Template.user_calc_list.onCreated(function() {
 Template.user_calc_list.helpers({
 
    calcList  : function (user) {
-    schemes = Schemes.find({userId: user._Id});
-    schemes = Schemes.find({});
+    schemes = Schemes.find({userId: user._id});
     topCalcs = schemes.map ((item) => {
       return Calculations.findOne({_id: item.last_calc_id});
     });
