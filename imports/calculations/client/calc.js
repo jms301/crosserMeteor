@@ -124,6 +124,9 @@ Template.calculation.helpers({
 });
 
 Template.results.helpers({
+  'apiUrl' : function ( calc ) {
+    return Meteor.absoluteUrl() + "api/" + calc.historyId;
+  },
   'pdfUrl' : function ( calc ) {
     return Meteor.absoluteUrl() + "static/" + calc._id + "/plots.pdf";
   },
