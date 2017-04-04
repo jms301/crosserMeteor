@@ -1,6 +1,7 @@
 //import { Template } from 'meteor/templating';
 //import { ReactiveVar } from 'meteor/reactive-var';
 import 'bootstrap/dist/css/bootstrap.min.css';
+
 import 'bootstrap/dist/js/bootstrap.min.js';
 import {default_resolution} from './default.js';
 import {default_species} from './default.js';
